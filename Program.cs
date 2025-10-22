@@ -4,6 +4,7 @@ using DirtyCoins.Services;
 using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml;
 using Serilog;
@@ -16,10 +17,15 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
     .AddJsonFile($"appsettings.{builder.Environment.EnvironmentName}.json", optional: true, reloadOnChange: true)
-    .AddEnvironmentVariables(); // 🔹 Cho phép đọc biến môi trường từ Render hoặc hệ thống
+    .AddEnvironmentVariables();
 
-// Load file .env (chạy local)
+// Load file .env khi chạy local
 Env.Load();
+
+// ================================
+// 2️⃣ Thiết lập license cho EPPlus
+// ================================
+ExcelPackage.License.SetNonCommercialPersonal("LVH_Admin");
 
 // ================================
 // 3️⃣ Kết nối CSDL
@@ -86,6 +92,7 @@ builder.Services.AddAuthentication(options =>
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]
                            ?? Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET") ?? "";
     options.CallbackPath = "/signin-google";
+
     if (string.IsNullOrWhiteSpace(options.ClientId) || string.IsNullOrWhiteSpace(options.ClientSecret))
         Console.WriteLine("⚠️ Google Auth chưa cấu hình!");
 
@@ -100,6 +107,13 @@ var app = builder.Build();
 // ================================
 // 9️⃣ Middleware pipeline
 // ================================
+
+// ✅ Nhận proxy headers để sửa lỗi redirect http:// -> https://
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor
+});
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
