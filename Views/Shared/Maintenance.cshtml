@@ -1,0 +1,126 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "DirtyCoins - Bảo trì hệ thống";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --dc-yellow: #FFD700;
+            --dc-dark: #111;
+            --dc-green: #006400;
+        }
+
+        body {
+            background: linear-gradient(180deg, #fff, #f9f9f9);
+            font-family: 'Inter', 'Poppins', sans-serif;
+            color: var(--dc-dark);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .maintenance-card {
+            background: #fff;
+            border-radius: 25px;
+            box-shadow: 0 10px 35px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 90%;
+            padding: 50px 30px;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        .maintenance-icon {
+            font-size: 3.5rem;
+            color: var(--dc-yellow);
+            text-shadow: 0 0 12px rgba(255,215,0,0.4);
+        }
+
+        .btn-reload {
+            border-radius: 25px;
+            font-weight: 600;
+            padding: 8px 18px;
+            transition: all 0.3s;
+            border: 1px solid #ccc;
+        }
+
+            .btn-reload:hover {
+                background-color: var(--dc-yellow);
+                color: #000;
+                border-color: var(--dc-yellow);
+                box-shadow: 0 0 10px rgba(255,215,0,0.4);
+            }
+
+        .reason {
+            font-style: italic;
+            color: #666;
+        }
+
+        @@keyframes fadeInUp {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="maintenance-card">
+        <div class="maintenance-icon mb-3">
+            <i class="bi bi-gear-wide-connected"></i>
+        </div>
+
+        <h2 class="fw-bold text-dark mb-2">🛠️ Hệ thống đang bảo trì</h2>
+        <p class="fs-6 text-muted">
+            Hệ thống đang được nâng cấp hoặc sửa lỗi.<br />
+            Vui lòng quay lại sau khi hoàn tất.
+        </p>
+
+        @if (!string.IsNullOrEmpty(ViewBag.Reason))
+        {
+            <p class="reason mt-3">@ViewBag.Reason</p>
+        }
+
+        <div class="mt-4">
+            <button id="btnReload" class="btn btn-reload">🔄 Thử lại</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("btnReload").addEventListener("click", async () => {
+            try {
+                const res = await fetch("/system/status");
+                const data = await res.json();
+
+                if (!data.IsMaintenance) {
+                    window.location.href = "/Home/Index";
+                } else {
+                    alert("⚠️ Hệ thống vẫn đang bảo trì.\nVui lòng thử lại sau!");
+                }
+            } catch (err) {
+                alert("Không thể kiểm tra trạng thái hệ thống: " + err.message);
+            }
+        });
+    </script>
+</body>
+</html>

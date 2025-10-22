@@ -1,0 +1,100 @@
+﻿@{
+    ViewData["Title"] = "Chính sách bảo mật — DirtyCoins";
+    Layout = "_Layout";
+}
+
+<style>
+    .privacy-container {
+        max-width: 900px;
+        margin: 5rem auto 0px;
+        background: #fff;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        padding: 3rem 3.5rem;
+    }
+
+    h1 {
+        font-family: 'Bebas Neue', sans-serif;
+        color: #111;
+        font-size: 2.5rem;
+        letter-spacing: 1px;
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    h5 {
+        font-family: 'Poppins', sans-serif;
+        color: #006400;
+        font-weight: 600;
+        margin-top: 2rem;
+    }
+
+    p, li {
+        color: #333;
+        line-height: 1.7;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .btn-back {
+        background: #FFD700;
+        color: #111;
+        font-weight: 600;
+        border-radius: 25px;
+        padding: 0.7rem 1.5rem;
+        transition: 0.3s;
+        display: inline-block;
+        margin-top: 2rem;
+    }
+
+        .btn-back:hover {
+            background: #111;
+            color: #FFD700;
+            transform: translateY(-2px);
+        }
+</style>
+
+<div class="privacy-container">
+    <h1>Chính sách bảo mật</h1>
+    <p class="text-muted text-center">Cập nhật lần cuối: <strong>@DateTime.UtcNow.ToString("dd/MM/yyyy")</strong></p>
+
+    <section>
+        <h5>1. Giới thiệu</h5>
+        <p>DirtyCoins cam kết bảo vệ thông tin cá nhân của người dùng. Chính sách này mô tả cách chúng tôi thu thập, sử dụng và bảo vệ dữ liệu của bạn.</p>
+    </section>
+
+    <section>
+        <h5>2. Dữ liệu chúng tôi thu thập</h5>
+        <ul>
+            <li>Thông tin tài khoản (email, tên đăng nhập, vai trò).</li>
+            <li>Thông tin cá nhân (tên, địa chỉ, điện thoại, giao hàng).</li>
+            <li>Dữ liệu giao dịch, lịch sử đơn hàng.</li>
+            <li>Thông tin kỹ thuật như cookie, địa chỉ IP.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h5>3. Mục đích sử dụng</h5>
+        <ul>
+            <li>Xử lý đơn hàng và giao dịch.</li>
+            <li>Cải thiện dịch vụ và hỗ trợ khách hàng.</li>
+            <li>Gửi thông báo khuyến mãi khi bạn đồng ý.</li>
+        </ul>
+    </section>
+
+    <section>
+        <h5>4. Bảo mật & quyền của bạn</h5>
+        <p>
+            Chúng tôi áp dụng các biện pháp mã hóa, phân quyền và sao lưu định kỳ.
+            Bạn có quyền yêu cầu truy cập, chỉnh sửa, xóa hoặc xuất dữ liệu cá nhân của mình.
+        </p>
+    </section>
+
+    <section>
+        <h5>5. Liên hệ</h5>
+        <p>Nếu bạn có thắc mắc, vui lòng liên hệ qua email: <a href="mailto:admin@dirtycoins.vn">admin@dirtycoins.vn</a></p>
+    </section>
+
+    <div class="text-center">
+        <a href="@Url.Action("Index", "Home")" class="btn-back">← Quay về trang chủ</a>
+    </div>
+</div>

@@ -1,0 +1,137 @@
+﻿@model DirtyCoins.ViewModels.OrderDetailViewModel
+@{
+    ViewData["Title"] = "Chi tiết đơn hàng";
+}
+
+<style>
+    .od-cus {
+        margin: 60px auto 0px;
+        padding-bottom: 40px;
+    }
+
+    .table thead th {
+        vertical-align: middle;
+    }
+
+    .text-green {
+        color: var(--dc-green);
+    }
+
+    .hover-glow:hover {
+        box-shadow: 0 0 10px rgba(0, 255, 128, 0.5);
+        transition: 0.3s ease;
+    }
+
+    .promo-info {
+        font-size: 0.85rem;
+        color: #888;
+    }
+</style>
+
+<div class="container dirtycoins-body od-cus">
+    <div class="card border-0 shadow-sm hover-glow p-4" style="border-radius:20px;">
+        <h3 class="fw-bold mb-4" style="color:var(--dc-green); font-family:'Bebas Neue',sans-serif;">
+            <i class="bi bi-receipt-cutoff me-2 text-gold"></i> Chi tiết đơn hàng
+        </h3>
+
+        <!-- ========== THÔNG TIN ĐƠN HÀNG & GIAO HÀNG ========== -->
+        <div class="row mb-4">
+            <div class="col-md-6 mb-3">
+                <h5 class="fw-semibold text-dark mb-3">Thông tin đơn hàng</h5>
+                <p><strong>Mã đơn:</strong> @Model.Order.OrderCode</p>
+                <p><strong>Ngày đặt:</strong> @Model.Order.OrderDate.ToString("dd/MM/yyyy")</p>
+                <p><strong>Trạng thái:</strong> @Model.Order.Status</p>
+                <p>
+                    <strong>Thanh toán:</strong>
+                    @if (Model.Order.Pay)
+                    {
+                        <span class="badge bg-success">Đã thanh toán</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-warning text-dark">Chưa thanh toán</span>
+                    }
+                </p>
+                <p><strong>Phương thức:</strong> @Model.Order.PaymentMethod</p>
+                <p><strong>Tổng tiền:</strong> <span class="fw-bold">@Model.Order.TotalAmount.ToString("N0") ₫</span></p>
+            </div>
+
+            <div class="col-md-6 mb-3">
+                <h5 class="fw-semibold text-dark mb-3">Thông tin giao hàng</h5>
+                <p><strong>Người nhận:</strong> @Model.Order.Receiver</p>
+                <p><strong>SĐT:</strong> @Model.Order.Phone</p>
+                <p><strong>Địa chỉ:</strong> @Model.Order.Address</p>
+            </div>
+        </div>
+
+        <!-- ========== BẢNG SẢN PHẨM ========== -->
+        <h5 class="fw-semibold text-dark mb-3">Sản phẩm trong đơn</h5>
+        <div class="table-responsive">
+            <table class="table table-striped align-middle text-center">
+                <thead style="background-color:var(--dc-dark); color:white;">
+                    <tr>
+                        <th>Hình ảnh</th>
+                        <th class="text-start">Sản phẩm</th>
+                        <th>Đơn giá (gốc)</th>
+                        <th>Giảm (%)</th>
+                        <th>Giá sau giảm</th>
+                        <th>Số lượng</th>
+                        <th>Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var i in Model.OrderDetails)
+                    {
+                        var originalUnit = i.Product?.Price ?? 0m;      // Giá gốc từ Product.Price
+                        var discountedUnit = i.UnitPrice;               // Giá lưu trong OrderDetail (đã áp dụng promo)
+                        var lineTotal = discountedUnit * i.Quantity;
+                        <tr>
+                            <td class="align-middle"><img src="@i.Product.Image" alt="@i.Product.Name" width="60" class="rounded shadow-sm" /></td>
+                            <td class="text-start align-middle">
+                                <div class="fw-semibold">@i.Product.Name</div>
+                                @if (!string.IsNullOrEmpty(i.PromotionName) && i.DiscountPercent > 0)
+                                {
+                                    <div class="promo-info"><i class="bi bi-tag-fill text-warning"></i> @i.PromotionName</div>
+                                }
+                            </td>
+                            <td class="align-middle">@originalUnit.ToString("N0") ₫</td>
+                            <td class="align-middle">
+                                @if (i.DiscountPercent > 0)
+                                {
+                                    <span class="text-success">-@i.DiscountPercent.ToString("0.#")%</span>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </td>
+                            <td class="align-middle">@discountedUnit.ToString("N0") ₫</td>
+                            <td class="align-middle">@i.Quantity</td>
+                            <td class="fw-bold align-middle">@lineTotal.ToString("N0") ₫</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- ========== TỔNG KẾT ========== -->
+        <div class="text-end mt-3">
+            <p>Giảm giá khuyến mãi: <strong class="text-info">-@Model.PromoDiscount.ToString("N0") ₫</strong></p>
+            <p>Ưu đãi thành viên: <strong class="text-info">-@Model.MemberDiscount.ToString("N0") ₫</strong></p>
+            <h5 class="text-dark fw-bold mt-3">
+                Tổng thanh toán:
+                <span class="text-green">
+                    @((Model.Order.TotalAmount).ToString("N0")) ₫
+                </span>
+            </h5>
+            <i>Bạn đã tiết kiệm được: <strong class="text-danger"> @Model.TotalSavings.ToString("N0") ₫</strong></i>
+        </div>
+
+        <!-- ========== NÚT QUAY LẠI ========== -->
+        <div class="mt-4 text-end">
+            <a href="@Url.Action("Orders", "Customer")" class="btn btn-outline-dark rounded-pill px-4 hover-glow">
+                ⬅ Quay lại đơn hàng
+            </a>
+        </div>
+    </div>
+</div>

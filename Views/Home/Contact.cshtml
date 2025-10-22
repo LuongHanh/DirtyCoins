@@ -1,0 +1,184 @@
+﻿@model DirtyCoins.Models.Contact
+@{
+    ViewData["Title"] = "Liên hệ — DirtyCoins";
+    Layout = "_Layout";
+    bool isAuthenticated = User?.Identity?.IsAuthenticated ?? false;
+}
+
+<style>
+    body {
+        background: linear-gradient(180deg, #fff, #fafafa);
+    }
+
+    .contact-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 5rem 1rem;
+    }
+
+    .contact-card {
+        max-width: 720px;
+        width: 100%;
+        background: #fff;
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        padding: 2.5rem 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+        .contact-card::before {
+            content: "";
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(255,215,0,0.3), transparent);
+            z-index: 0;
+            transition: 1s ease;
+        }
+
+        .contact-card:hover::before {
+            transform: translate(-40px, 40px);
+        }
+
+    h2 {
+        font-family: 'Bebas Neue', sans-serif;
+        letter-spacing: 1px;
+        text-align: center;
+        color: #111;
+        margin-bottom: 1rem;
+        font-size: 2.5rem;
+    }
+
+    .subtitle {
+        text-align: center;
+        color: #666;
+        margin-bottom: 2rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #111;
+    }
+
+    .form-control, .form-select {
+        border-radius: 12px;
+        border: 1px solid #ccc;
+        padding: 0.75rem 1rem;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #FFD700;
+            box-shadow: 0 0 8px rgba(255,215,0,0.4);
+        }
+
+    .btn-send {
+        background: #FFD700;
+        border: none;
+        border-radius: 25px;
+        font-weight: 700;
+        color: #111;
+        padding: 0.75rem 1.5rem;
+        transition: 0.3s;
+    }
+
+        .btn-send:hover {
+            background: #111;
+            color: #FFD700;
+            transform: translateY(-2px);
+        }
+</style>
+
+<div class="contact-container">
+    <div class="contact-card">
+        <h2>Liên hệ với DirtyCoins</h2>
+        <p class="subtitle">Chúng tôi luôn sẵn sàng lắng nghe từ bạn</p>
+
+        <form id="contactForm" method="post" action="/Home/Contact">
+            @Html.AntiForgeryToken()
+            <div class="mb-3">
+                <label class="form-label">Họ và tên</label>
+                <input type="text" name="Name" class="form-control" value="@Model.Name" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" name="Email" class="form-control" value="@Model.Email" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Chủ đề</label>
+                <input type="text" name="Subject" class="form-control" value="@Model.Subject" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Chọn cửa hàng muốn liên hệ</label>
+                <select name="IdStore" class="form-select" required>
+                    <option value="">-- Chọn cửa hàng --</option>
+                    @if (ViewBag.Stores != null)
+                    {
+                        foreach (var store in ViewBag.Stores)
+                        {
+                            <option value="@store.IdStore">@store.StoreName</option>
+                        }
+                    }
+                </select>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">Nội dung</label>
+                <textarea name="Message" class="form-control" rows="5" required>@Model.Message</textarea>
+            </div>
+
+            <div class="text-center">
+                <button type="submit" class="btn btn-send px-5">Gửi liên hệ</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const isAuthenticated = @isAuthenticated.ToString().ToLower();
+        const form = document.getElementById("contactForm");
+
+        if (!isAuthenticated) {
+            form.addEventListener("submit", e => {
+                e.preventDefault();
+                Swal.fire({
+                    title: "Yêu cầu đăng nhập",
+                    text: "Bạn cần đăng nhập để gửi liên hệ.",
+                    icon: "info",
+                    confirmButtonText: "Đăng nhập",
+                    confirmButtonColor: "#FFD700"
+                }).then(() => window.location.href = "/Account/Login");
+            });
+        } else {
+            form.addEventListener("submit", async e => {
+                e.preventDefault();
+                const formData = new FormData(form);
+                const res = await fetch(form.action, { method: "POST", body: formData });
+                const data = await res.json();
+
+                if (data.success) {
+                    Swal.fire({
+                        title: "✅ Gửi thành công!",
+                        text: data.message,
+                        icon: "success",
+                        confirmButtonText: "OK",
+                        confirmButtonColor: "#FFD700"
+                    }).then(() => window.location.href = "/Home/Index");
+                } else {
+                    Swal.fire("Lỗi!", data.message || "Vui lòng thử lại.", "error");
+                }
+            });
+        }
+    </script>
+}

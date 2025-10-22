@@ -1,0 +1,623 @@
+﻿@model IEnumerable<DirtyCoins.Models.Product>
+@{
+    ViewData["Title"] = "Quản lý sản phẩm & danh mục";
+    var categories = ViewBag.Categories as List<DirtyCoins.Models.Category>;
+}
+
+<style>
+    /* ======= THEME: Đen - Xám Sáng ======= */
+    :root {
+        --dc-yellow: #d4af37;
+        --dc-bg-dark: #111;
+        --dc-bg-soft: #f8f9fa;
+        --dc-border: #e0e0e0;
+        --dc-text-dark: #222;
+        --dc-text-muted: #666;
+        --radius: 12px;
+        --transition: 0.25s ease;
+    }
+
+    body {
+        background: var(--dc-bg-soft);
+        font-family: "Inter", "Poppins", sans-serif;
+        color: var(--dc-text-dark);
+    }
+
+    /* HEADER TAB */
+    .nav-tabs {
+        border-bottom: 3px solid var(--dc-yellow);
+        justify-content: center;
+    }
+
+        .nav-tabs .nav-link {
+            color: var(--dc-text-muted);
+            font-weight: 600;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            transition: all var(--transition);
+        }
+
+            .nav-tabs .nav-link.active {
+                background-color: var(--dc-yellow);
+                color: var(--dc-bg-dark);
+                border-radius: 10px 10px 0 0;
+            }
+
+            .nav-tabs .nav-link:hover {
+                color: var(--dc-yellow);
+            }
+
+    /* SECTION HEADER */
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1.5rem;
+        background: linear-gradient(135deg, #1a1a1a, #202020);
+        color: var(--dc-yellow);
+        padding: 1rem 1.5rem;
+        border-radius: var(--radius);
+        box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3);
+    }
+
+        .section-header h3 {
+            margin: 0;
+            font-family: "Bebas Neue", sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .section-header button {
+            background: var(--dc-yellow);
+            border: none;
+            color: var(--dc-bg-dark);
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            transition: all var(--transition);
+        }
+
+            .section-header button:hover {
+                background: #f5e58c;
+                transform: translateY(-1px);
+            }
+
+    /* TABLE */
+    .table {
+        border-radius: 10px;
+        overflow: hidden;
+        margin-top: 1rem;
+        border-collapse: collapse;
+        background: white;
+    }
+
+        .table thead {
+            background: #2a2a2a;
+            color: var(--dc-yellow);
+        }
+
+        .table th, .table td {
+            vertical-align: middle;
+            text-align: center;
+            padding: 0.75rem;
+        }
+
+        .table tr:hover {
+            background: #fff9e5;
+            transition: all var(--transition);
+        }
+
+        .table .editable {
+            cursor: text;
+            background-color: #fdfdfd;
+            border-radius: 5px;
+            width: 180px;
+        }
+
+        .table .discount {
+            width: 100px;
+        }
+
+    /* BUTTONS */
+    .btn {
+        border-radius: 8px;
+        transition: all var(--transition);
+    }
+
+    .btn-success {
+        background-color: #198754;
+        border: none;
+    }
+
+        .btn-success:hover {
+            background-color: #157347;
+        }
+
+    .btn-danger {
+        background-color: #dc3545;
+        border: none;
+    }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+    /* MODAL */
+    .modal-content {
+        border-radius: 14px;
+        overflow: hidden;
+        border: none;
+        box-shadow: 0 6px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .modal-header {
+        background: #111;
+        color: var(--dc-yellow);
+        border-bottom: none;
+    }
+
+    .modal-footer {
+        border-top: none;
+        background: #fafafa;
+    }
+
+    .modal .btn-primary {
+        background: var(--dc-yellow);
+        color: var(--dc-bg-dark);
+        border: none;
+    }
+
+        .modal .btn-primary:hover {
+            background: #f4e38b;
+        }
+
+    /* HR separator */
+    hr {
+        border: none;
+        border-top: 3px dashed #ccc;
+        margin: 3rem 0;
+    }
+
+    /* Form */
+    .form-label {
+        font-weight: 500;
+        color: var(--dc-text-dark);
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid var(--dc-border);
+    }
+</style>
+
+<div class="container mt-4">
+    <!-- ===== Tabs ===== -->
+    <a href="/Staff/Dashboard" class="btn btn-outline-dark rounded-pill mt-5">
+        ⬅ Quay lại
+    </a>
+    <ul class="nav nav-tabs" id="manageTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="products-tab" data-bs-toggle="tab" data-bs-target="#products" type="button" role="tab">🛒 Sản phẩm</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="categories-tab" data-bs-toggle="tab" data-bs-target="#categories" type="button" role="tab">📂 Danh mục</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="promotions-tab" data-bs-toggle="tab" data-bs-target="#promotions" type="button" role="tab">🎁 Khuyến mãi</button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="manageTabsContent">
+
+        <!-- 🛒 TAB SẢN PHẨM -->
+        <div class="tab-pane fade show active" id="products" role="tabpanel">
+            <div class="section-header mt-3">
+                <h3>🛒 Quản lý sản phẩm</h3>
+                <button id="btnAddProduct">+ Thêm sản phẩm</button>
+            </div>
+            <table class="table table-bordered table-hover mt-3 align-middle">
+                <thead>
+                    <tr>
+                        <th>Mã</th>
+                        <th>Tên</th>
+                        <th>Loại</th>
+                        <th>Giá</th>
+                        <th>Tồn kho</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var p in Model)
+                    {
+                        <tr data-id="@p.IdProduct">
+                            <td>@p.IdProduct</td>
+                            <td contenteditable="true" class="editable name">@p.Name</td>
+                            <td>
+                                <select class="form-select category">
+                                    @foreach (var c in categories)
+                                    {
+                                        <option value="@c.IdCategory" selected="@(p.IdCategory == c.IdCategory)">
+                                            @c.Name
+                                        </option>
+                                    }
+                                </select>
+                            </td>
+                            <td contenteditable="true" class="editable price">@p.Price</td>
+                            <td contenteditable="true" class="editable quantity">@p.Quantity</td>
+                            <td>
+                                <button class="btn btn-success btn-sm btn-save-product">Lưu</button>
+                                <button class="btn btn-danger btn-sm btn-delete-product">Xóa</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 📂 TAB DANH MỤC -->
+        <div class="tab-pane fade" id="categories" role="tabpanel">
+            <div class="section-header mt-3">
+                <h3>📂 Quản lý danh mục</h3>
+                <button id="btnAddCategory">+ Thêm danh mục</button>
+            </div>
+            <table class="table table-bordered table-hover mt-3 align-middle">
+                <thead>
+                    <tr>
+                        <th>Mã</th>
+                        <th>Tên danh mục</th>
+                        <th>Mô tả</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="categoryTable">
+                    @foreach (var c in categories)
+                    {
+                        <tr data-id="@c.IdCategory">
+                            <td>@c.IdCategory</td>
+                            <td contenteditable="true" class="editable name">@c.Name</td>
+                            <td contenteditable="true" class="editable desc">@c.Description</td>
+                            <td>
+                                <button class="btn btn-success btn-sm btn-save-category">Lưu</button>
+                                <button class="btn btn-danger btn-sm btn-delete-category">Xóa</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 🎁 TAB KHUYẾN MÃI -->
+        <div class="tab-pane fade" id="promotions" role="tabpanel">
+            <div class="section-header mt-3">
+                <h3>🎁 Quản lý khuyến mãi</h3>
+                <button id="btnAddPromotion">+ Thêm khuyến mãi</button>
+            </div>
+            <table class="table table-bordered table-hover mt-3 align-middle">
+                <thead>
+                    <tr>
+                        <th>Mã</th>
+                        <th>Tên khuyến mãi</th>
+                        <th>Mô tả</th>
+                        <th>Giảm (%)</th>
+                        <th>Bắt đầu</th>
+                        <th>Kết thúc</th>
+                        <th>Trạng thái</th>
+                        <th>Hành động</th>
+                    </tr>
+                </thead>
+                <tbody id="promotionTable">
+                    @foreach (var promo in ViewBag.Promotions as List<DirtyCoins.Models.Promotion>)
+                    {
+                        <tr data-id="@promo.IdPromotion">
+                            <td>@promo.IdPromotion</td>
+                            <td contenteditable="true" class="editable name">@promo.PromotionName</td>
+                            <td contenteditable="true" class="editable desc">@promo.DescriptionP</td>
+                            <td contenteditable="true" class="editable discount">@promo.DiscountPercent</td>
+                            <td><input type="date" class="form-control startDate" value="@promo.StartDate.ToString("yyyy-MM-dd")" /></td>
+                            <td><input type="date" class="form-control endDate" value="@promo.EndDate.ToString("yyyy-MM-dd")" /></td>
+                            <td><input type="checkbox" class="form-check-input isActive" @(promo.IsActive ? "checked" : "") /></td>
+                            <td>
+                                <button class="btn btn-success btn-sm btn-save-promo">Lưu</button>
+                                <button class="btn btn-danger btn-sm btn-delete-promo">Xóa</button>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Modal thêm sản phẩm -->
+<div class="modal fade" id="addProductModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">➕ Thêm sản phẩm mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addProductForm" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tên sản phẩm</label>
+                            <input type="text" class="form-control" name="Name" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Loại</label>
+                            <select class="form-select" name="IdCategory" required>
+                                <option value="">-- Chọn loại --</option>
+                                @foreach (var c in categories)
+                                {
+                                    <option value="@c.IdCategory">@c.Name</option>
+                                }
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Giá</label>
+                            <input type="number" class="form-control" name="Price" step="0.01" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Số lượng</label>
+                            <input type="number" class="form-control" name="Quantity" required />
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Ảnh sản phẩm</label>
+                            <input type="file" class="form-control" name="ImageFile" accept="image/*" required />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-control" name="Description" rows="3" required></textarea>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-dark" data-bs-dismiss="modal">Đóng</button>
+                <button class="btn btn-primary" id="btnSubmitAddProduct">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal thêm danh mục -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">➕ Thêm danh mục mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addCategoryForm">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label">Tên danh mục</label>
+                        <input type="text" class="form-control" name="Name" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
+                        <textarea class="form-control" name="Description" rows="3" required></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-dark" data-bs-dismiss="modal">Đóng</button>
+                <button class="btn btn-primary" id="btnSubmitAddCategory">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal thêm khuyến mãi -->
+<div class="modal fade" id="addPromotionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">➕ Thêm khuyến mãi mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addPromotionForm">
+                    @Html.AntiForgeryToken()
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Tên khuyến mãi</label>
+                            <input type="text" class="form-control" name="PromotionName" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Giảm giá (%)</label>
+                            <input type="number" class="form-control" name="DiscountPercent" step="0.01" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Mô tả</label>
+                            <textarea class="form-control" name="DescriptionP" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ngày bắt đầu</label>
+                            <input type="date" class="form-control" name="StartDate" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Ngày kết thúc</label>
+                            <input type="date" class="form-control" name="EndDate" required />
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline-dark" data-bs-dismiss="modal">Đóng</button>
+                <button class="btn btn-primary" id="btnSubmitAddPromotion">Lưu</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/7.0.5/signalr.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+            // ====== PRODUCT ======
+            document.getElementById("btnAddProduct").addEventListener("click", () => {
+                new bootstrap.Modal(document.getElementById("addProductModal")).show();
+            });
+
+            document.getElementById("btnSubmitAddProduct").addEventListener("click", async () => {
+                const form = document.getElementById("addProductForm");
+                const formData = new FormData(form);
+                try {
+                    const res = await fetch("/Staff/AddProduct", { method: "POST", body: formData });
+                    const data = await res.json();
+                    alert(data.message);
+                    if (data.success) location.reload();
+                } catch { alert("❌ Lỗi khi thêm sản phẩm."); }
+            });
+
+            document.querySelectorAll(".btn-save-product").forEach(btn => {
+                btn.addEventListener("click", e => {
+                    const tr = e.target.closest("tr");
+                    const form = new URLSearchParams();
+                    form.append("__RequestVerificationToken", token);
+                    form.append("IdProduct", tr.dataset.id);
+                    form.append("Name", tr.querySelector(".name").innerText.trim());
+                    form.append("Price", tr.querySelector(".price").innerText.trim());
+                    form.append("Quantity", tr.querySelector(".quantity").innerText.trim());
+                    form.append("IdCategory", tr.querySelector(".category").value);
+                    fetch("/Staff/UpdateProduct", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: form })
+                        .then(r => r.json()).then(d => alert(d.message));
+                });
+            });
+
+            document.querySelectorAll(".btn-delete-product").forEach(btn => {
+                btn.addEventListener("click", e => {
+                    if (!confirm("Xóa sản phẩm này?")) return;
+                    const id = e.target.closest("tr").dataset.id;
+                    const form = new URLSearchParams();
+                    form.append("__RequestVerificationToken", token);
+                    form.append("id", id);
+                    fetch("/Staff/DeleteProduct", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: form })
+                        .then(r => r.json()).then(d => { alert(d.message); if (d.success) location.reload(); });
+                });
+            });
+
+            // ====== CATEGORY ======
+            document.getElementById("btnAddCategory").addEventListener("click", () => {
+                new bootstrap.Modal(document.getElementById("addCategoryModal")).show();
+            });
+
+            document.getElementById("btnSubmitAddCategory").addEventListener("click", async () => {
+                const form = document.getElementById("addCategoryForm");
+                const formData = new FormData(form);
+
+                const obj = {};
+                formData.forEach((v, k) => obj[k] = v);
+
+                try {
+                    const res = await fetch("/Staff/AddCategory", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "RequestVerificationToken": document.querySelector("input[name='__RequestVerificationToken']").value
+                        },
+                        body: JSON.stringify(obj)
+                    });
+                    const data = await res.json();
+                    alert(data.message);
+                    if (data.success) location.reload();
+                } catch {
+                    alert("❌ Lỗi khi thêm danh mục.");
+                }
+            });
+
+            document.querySelectorAll(".btn-save-category").forEach(btn => {
+                btn.addEventListener("click", e => {
+                    const tr = e.target.closest("tr");
+                    const form = new URLSearchParams();
+                    form.append("__RequestVerificationToken", token);
+                    form.append("IdCategory", tr.dataset.id);
+                    form.append("Name", tr.querySelector(".name").innerText.trim());
+                    form.append("Description", tr.querySelector(".desc").innerText.trim());
+                    fetch("/Staff/UpdateCategory", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: form })
+                        .then(r => r.json()).then(d => alert(d.message));
+                });
+            });
+
+            document.querySelectorAll(".btn-delete-category").forEach(btn => {
+                btn.addEventListener("click", e => {
+                    if (!confirm("Xóa danh mục này?")) return;
+                    const id = e.target.closest("tr").dataset.id;
+                    const form = new URLSearchParams();
+                    form.append("__RequestVerificationToken", token);
+                    form.append("id", id);
+                    fetch("/Staff/DeleteCategory", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: form })
+                        .then(r => r.json()).then(d => { alert(d.message); if (d.success) location.reload(); });
+                });
+            });
+
+            // ====== SIGNALR ======
+            const connection = new signalR.HubConnectionBuilder().withUrl("/categoryHub").build();
+            connection.on("ReloadCategories", () => location.reload());
+            connection.start().catch(err => console.error(err));
+        });
+
+    // ====== PROMOTION ======
+    document.getElementById("btnAddPromotion").addEventListener("click", () => {
+        new bootstrap.Modal(document.getElementById("addPromotionModal")).show();
+    });
+
+    document.getElementById("btnSubmitAddPromotion").addEventListener("click", async () => {
+        const form = document.getElementById("addPromotionForm");
+        const formData = new FormData(form);
+        try {
+            const res = await fetch("/Staff/AddPromotion", { method: "POST", body: formData });
+            const data = await res.json();
+            alert(data.message);
+            if (data.success) location.reload();
+        } catch {
+            alert("❌ Lỗi khi thêm khuyến mãi.");
+        }
+    });
+
+    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+    document.querySelectorAll(".btn-save-promo").forEach(btn => {
+        btn.addEventListener("click", async e => {
+            const tr = e.target.closest("tr");
+            const form = new URLSearchParams();
+            form.append("__RequestVerificationToken", token);
+            form.append("IdPromotion", tr.dataset.id);
+            form.append("PromotionName", tr.querySelector(".name").innerText.trim());
+            form.append("DescriptionP", tr.querySelector(".desc").innerText.trim());
+            form.append("DiscountPercent", tr.querySelector(".discount").innerText.trim());
+            form.append("StartDate", tr.querySelector(".startDate").value);
+            form.append("EndDate", tr.querySelector(".endDate").value);
+            form.append("IsActive", tr.querySelector(".isActive").checked);
+            const res = await fetch("/Staff/UpdatePromotion", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: form
+            });
+            const data = await res.json();
+            alert(data.message);
+        });
+    });
+
+    document.querySelectorAll(".btn-delete-promo").forEach(btn => {
+        btn.addEventListener("click", async e => {
+            if (!confirm("Xóa khuyến mãi này?")) return;
+            const id = e.target.closest("tr").dataset.id;
+            const form = new URLSearchParams();
+            form.append("__RequestVerificationToken", token);
+            form.append("id", id);
+            const res = await fetch("/Staff/DeletePromotion", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: form
+            });
+            const data = await res.json();
+            alert(data.message);
+            if (data.success) location.reload();
+        });
+    });
+    </script>
+}

@@ -1,0 +1,617 @@
+﻿@model DirtyCoins.ViewModels.ProductDetailViewModel
+@{
+    ViewData["Title"] = Model.Product.Name;
+    Layout = "_Layout";
+}
+
+<style>
+/* ============================================================
+   PRODUCT DETAIL PAGE — DIRTYCOINS ENHANCED STYLE
+   ============================================================ */
+.product-detail-page {
+    margin-top: 85px !important;
+    animation: fadeInUp 0.7s ease;
+}
+
+/* Fonts & Titles */
+.product-detail-page h2,
+.product-detail-page h4,
+.product-detail-page h5 {
+    font-family: 'Bebas Neue', sans-serif;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+
+/* Card & background */
+.product-detail-page .bg-white {
+    background-color: #fff;
+    border-radius: 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.product-detail-page .bg-white:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+/* Images */
+.product-detail-page img {
+    transition: transform 0.6s ease, box-shadow 0.4s ease;
+    border-radius: 20px;
+}
+.product-detail-page img:hover {
+    transform: scale(1.05) rotate(1deg);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.25);
+}
+
+/* Pricing Section */
+.product-detail-page h3 {
+    font-size: 2rem;
+    background: linear-gradient(90deg, #ff6600, #ffd200);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: gradientMove 3s infinite linear;
+}
+@@keyframes gradientMove {
+    0% {background-position: 0%;}
+    100% {background-position: 200%;}
+}
+
+.des-and-feed {
+    display: flex;
+    align-items: start;
+    justify-content: start;
+    gap: 20px;
+}
+/* Buttons */
+.product-detail-page .btn {
+    border-radius: 30px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.product-detail-page .btn.bg-gold:hover {
+    background: linear-gradient(135deg, #ffd200, #ff6600);
+    box-shadow: 0 6px 25px rgba(255, 165, 0, 0.5);
+    transform: translateY(-3px) scale(1.03);
+}
+.product-detail-page .btn.bg-green:hover {
+    background: linear-gradient(135deg, #00c853, #008c3a);
+    box-shadow: 0 6px 25px rgba(0, 128, 0, 0.4);
+    transform: translateY(-3px) scale(1.03);
+}
+
+/* Quantity Input */
+.product-detail-page input[type=number] {
+    border-radius: 12px;
+    border: 1px solid #ccc;
+    text-align: center;
+    transition: all 0.3s ease;
+}
+.product-detail-page input[type=number]:focus {
+    border-color: #ffbb33;
+    box-shadow: 0 0 8px rgba(255,187,51,0.5);
+}
+
+/* Description & Table */
+.product-description {
+    border: 1px solid #eee;
+    background: #f9f9ff;
+    border-radius: 18px;
+    transition: all 0.3s ease;
+}
+.product-description:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+}
+
+/* Feedback Cards */
+#feedbackContainer .border {
+    border-color: rgba(0, 0, 0, 0.05) !important;
+}
+#feedbackContainer .bg-light {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 235, 0.9));
+}
+#feedbackContainer .like-btn:hover i,
+#feedbackContainer .reply-toggle:hover i {
+    color: #ffbb33;
+    transform: scale(1.2);
+    transition: all 0.3s ease;
+}
+#starRating .star:hover {
+    transform: scale(1.4) rotate(-10deg);
+}
+
+/* Divider */
+hr.my-5 {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #ffbb33, transparent);
+    margin: 4rem 0;
+}
+
+/* Fade-in animation */
+@@keyframes fadeInUp {
+    from {opacity: 0; transform: translateY(30px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+
+/* Image popup */
+.image-popup {
+    display: none;
+    position: fixed;
+    z-index: 9999;
+    left: 0; top: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    justify-content: center; align-items: center; flex-direction: column;
+    animation: fadeInScale 0.4s ease;
+}
+.image-popup img {
+    max-width: 80%; max-height: 80%;
+    border-radius: 15px;
+    box-shadow: 0 0 30px rgba(255,255,255,0.3);
+    cursor: zoom-out;
+}
+.image-popup .close-popup,
+.image-popup .nav-btn {
+    transition: all 0.3s ease;
+}
+.image-popup .close-popup:hover,
+.image-popup .nav-btn:hover {
+    color: #ffd200;
+    transform: scale(1.2);
+}
+@@keyframes fadeInScale {
+    from {opacity: 0; transform: scale(0.8);}
+    to {opacity: 1; transform: scale(1);}
+}
+
+/* Thumbnails */
+.thumbnail-row img.thumb.active {
+    border: 3px solid #ff6600;
+    transform: scale(1.1);
+}
+.thumbnail-row img.thumb:hover {
+    transform: scale(1.1) rotate(-2deg);
+    border-color: #ffbb33;
+    transition: all 0.25s;
+}
+</style>
+
+<!-- ================= PRODUCT DETAILS PAGE ================= -->
+<section class="container product-detail-page mt-5 pb-4">
+    <div class="row g-4 align-items-start">
+        <!-- Ảnh sản phẩm -->
+        <!-- ================= PRODUCT IMAGE GALLERY & POPUP ================= -->
+        <div class="col-lg-6 text-center">
+            <div class="product-gallery">
+                <!-- Main Image -->
+                <div class="main-image">
+                    <img id="mainProductImage"
+                         src="@(@Model.Product.Image ?? "~/images/placeholder.png")"
+                         alt="@Model.Product.Name"
+                         class="img-fluid rounded shadow hover-glow"
+                         style="max-height:300px;object-fit:contain;cursor:zoom-in;" />
+                </div>
+
+                <!-- Thumbnails -->
+                <div class="thumbnail-row mt-3">
+                    @for (int i = 0; i < Model.ProductImages.Count; i++)
+                    {
+                        <img src="@Model.ProductImages[i].ImageUrl" class="thumb rounded"
+                             style="width:70px;height:70px;object-fit:cover;cursor:pointer;border:2px solid transparent;" />
+                    }
+                </div>
+
+                <!-- Popup -->
+                <div id="imagePopup" class="image-popup">
+                    <span class="close-popup">&times;</span>
+                    <span class="nav-btn prev-btn">&#10094;</span>
+                    <img id="popupImage" src="" alt="Zoomed Image" />
+                    <span class="nav-btn next-btn">&#10095;</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Thông tin sản phẩm -->
+        <div class="col-lg-6">
+            <div class="p-4 bg-white rounded shadow-sm border" style="background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 235, 0.9)); border-radius:20px;">
+                <h2 class="fw-bold text-uppercase mb-1">@Model.Product.Name</h2>
+                <p class="text-muted mb-2"><i class="bi bi-tag"></i> @Model.Product.Category?.Name</p>
+
+                @if (Model.DiscountPercent > 0)
+                {
+                    <p class="text-muted text-decoration-line-through mb-1">@Model.Product.Price.ToString("N0") ₫</p>
+                    <h3 class="fw-bold text-danger mb-3">
+                        @Model.DiscountedPrice.ToString("N0") ₫
+                        <span class="badge bg-danger-subtle text-danger ms-1">-@Model.DiscountPercent%</span>
+                    </h3>
+                }
+                else
+                {
+                    <h3 class="fw-bold text-dark mb-3">@Model.Product.Price.ToString("N0") ₫</h3>
+                }
+
+                <p class="mb-4 lh-lg">@Html.Raw(Model.Product.Description)</p>
+
+                <div class="d-flex align-items-center flex-wrap gap-3 mb-3">
+                    <div>
+                        <label class="form-label fw-semibold"><i>Số lượng</i></label>
+                        <input type="number" id="quantityInput" value="1" min="1"
+                               class="form-control" style="width:120px" />
+                    </div>
+
+                    <button id="addToCartBtn" type="button" class="btn bg-green text-light fw-semibold px-4">
+                        <i class="bi bi-cart-plus"></i> Thêm vào giỏ
+                    </button>
+
+                    <form method="post" asp-controller="Cart" asp-action="CheckoutSingle" class="d-inline">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="IdProduct" value="@Model.Product.IdProduct" />
+                        <input type="hidden" name="quantity" value="1" />
+                        <button type="submit" class="btn bg-gold fw-semibold text-dark px-4">
+                            <i class="bi bi-cash-stack"></i> Mua ngay
+                        </button>
+                    </form>
+                </div>
+
+                <div id="cartMessage" class="text-success mt-2" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <hr class="" />
+
+    <div class="des-and-feed">
+        <!-- 🔹 MÔ TẢ CHI TIẾT -->
+        <div class="product-description bg-white p-4 rounded shadow-sm" style="background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 235, 0.9)); width: 65%;">
+            <h4 class="fw-bold text-uppercase mb-3 text-dark">Giới thiệu sản phẩm</h4>
+            <p class="lh-lg">@Html.Raw(Model.Product.Intro ?? "<i>Chưa có phần giới thiệu cho sản phẩm này.</i>")</p>
+            <p class="lh-lg">@Html.Raw(Model.Product.Description ?? "<i>Chưa có phần mô tả chi tiết cho sản phẩm này.</i>")</p>
+
+            <h6 class="fw-bold text-uppercase mt-4 mb-3 text-success">Bảng size tham khảo</h6>
+            <div class="table-responsive">
+                <table class="table table-bordered text-center align-middle bg-white">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Size</th>
+                            <th>Chiều cao (cm)</th>
+                            <th>Cân nặng (kg)</th>
+                            <th>Ngực (cm)</th>
+                            <th>Dài áo (cm)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr><td>S</td><td>155–165</td><td>45–55</td><td>88–92</td><td>65</td></tr>
+                        <tr><td>M</td><td>160–170</td><td>50–60</td><td>92–96</td><td>67</td></tr>
+                        <tr><td>L</td><td>165–175</td><td>55–70</td><td>96–100</td><td>69</td></tr>
+                        <tr><td>XL</td><td>170–180</td><td>65–80</td><td>100–106</td><td>71</td></tr>
+                        <tr><td>XXL</td><td>175–185</td><td>75–90</td><td>106–112</td><td>73</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <p class="text-muted small fst-italic">*Bảng size chỉ mang tính chất tham khảo, có thể chênh lệch tuỳ form sản phẩm.</p>
+        </div>
+
+        <hr class="my-5" />
+
+        <!-- 🔹 FEEDBACK SECTION -->
+        <section class="" style="width: 35%">
+            <h4 class="fw-bold text-uppercase mb-3 text-dark">Đánh giá sản phẩm</h4>
+
+            <!-- Feedback Container -->
+            <div id="feedbackContainer">
+                @if (Model.Feedbacks != null && Model.Feedbacks.Any())
+                {
+                    for (int i = 0; i < Model.Feedbacks.Count; i++)
+                    {
+                        var f = Model.Feedbacks[i];
+                        <div class="feedback-card mb-3 p-3 border rounded bg-light shadow-sm" data-index="@i" style="display:none;">
+                            <strong>@(f.UserName ?? "Người dùng")</strong>
+                            <span class="text-warning">(@f.Rating)★</span>
+                            <p class="mb-1">@f.Content</p>
+
+                            <div class="d-flex gap-3 mb-2">
+                                <button type="button" class="btn btn-link p-0 text-primary like-btn" data-id="@f.IdFeedback">
+                                    <i class="bi bi-hand-thumbs-up"></i> Thích (@f.LikeCount)
+                                </button>
+                                <button type="button" class="btn btn-link p-0 text-secondary reply-toggle" data-id="@f.IdFeedback">
+                                    <i class="bi bi-reply"></i> Phản hồi
+                                </button>
+                            </div>
+
+                            <div class="replies ms-3">
+                                @if (f.Replies != null && f.Replies.Any())
+                                {
+                                    foreach (var r in f.Replies)
+                                    {
+                                        <div class="p-2 mb-2 bg-white border-start border-3 @(r.IsStaff ? "border-success" : "border-info") rounded">
+                                            <strong class="@(r.IsStaff ? "text-success" : "text-info")">@r.UserName</strong>
+                                            <p class="mb-1">@r.ReplyContent</p>
+                                            <small class="text-muted">@r.ReplyDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small>
+                                        </div>
+                                    }
+                                }
+                            </div>
+
+                            @if (User.Identity?.IsAuthenticated ?? false)
+                            {
+                                <form class="reply-form mt-2 d-none" data-feedback-id="@f.IdFeedback">
+                                    @Html.AntiForgeryToken()
+                                    <textarea class="form-control reply-content mb-1" rows="2" placeholder="Viết phản hồi..."></textarea>
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button type="button" class="btn btn-sm btn-outline-secondary cancel-reply">Hủy</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-success">Gửi</button>
+                                    </div>
+                                </form>
+                            }
+                        </div>
+                    }
+
+                    <div class="feedback-pagination mt-3 d-flex justify-content-center gap-2">
+                        <button class="btn btn-outline-secondary btn-sm" id="prevPage">Prev</button>
+                        <span class="fw-bold" id="pageInfo">1 / 1</span>
+                        <button class="btn btn-outline-secondary btn-sm" id="nextPage">Next</button>
+                    </div>
+                }
+                else
+                {
+                    <p class="text-muted fst-italic">Chưa có đánh giá nào cho sản phẩm này.</p>
+                }
+            </div>
+
+            @if (User.Identity?.IsAuthenticated ?? false)
+            {
+                <hr class="my-4" />
+                <h5 class="fw-bold mb-3">Gửi đánh giá của bạn</h5>
+                <form id="feedbackForm">
+                    @Html.AntiForgeryToken()
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Điểm đánh giá:</label>
+                        <div id="starRating" class="mb-2">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="bi bi-star text-warning fs-4 star" data-value="@i" style="cursor:pointer;"></i>
+                            }
+                        </div>
+                        <input type="hidden" id="ratingInput" value="0" />
+                        <textarea id="contentInput" class="form-control mt-2" rows="3" placeholder="Viết cảm nhận của bạn..."></textarea>
+                        <button id="submitFeedbackBtn" type="submit" class="btn btn-primary mt-2 text-dark" style="background: linear-gradient(90deg, #ffd76a, #ffb84d);">Gửi đánh giá</button>
+                    </div>
+                </form>
+            }
+            else
+            {
+                <p class="text-muted fst-italic">
+                    Vui lòng <a href="/Account/Login">đăng nhập</a> để gửi đánh giá và phản hồi.
+                </p>
+            }
+        </section>
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const mainImage = document.getElementById('mainProductImage');
+        const thumbnails = document.querySelectorAll('.thumbnail-row img.thumb');
+        const popup = document.getElementById('imagePopup');
+        const popupImg = document.getElementById('popupImage');
+        const closeBtn = popup.querySelector('.close-popup');
+        const prevBtn = popup.querySelector('.prev-btn');
+        const nextBtn = popup.querySelector('.next-btn');
+        let currentIndex = 0;
+
+        // Chọn thumbnail
+        thumbnails.forEach((thumb, index) => {
+            if(index === 0) thumb.classList.add('active'); // mặc định ảnh đầu active
+            thumb.addEventListener('click', function() {
+                mainImage.src = this.src;
+                thumbnails.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentIndex = index;
+            });
+        });
+
+        // Mở popup khi click main image
+        mainImage.addEventListener('click', () => {
+            popup.style.display = 'flex';
+            showPopupImage(currentIndex);
+        });
+
+        // Đóng popup
+        closeBtn.addEventListener('click', () => popup.style.display = 'none');
+        popup.addEventListener('click', e => { if(e.target === popup) popup.style.display='none'; });
+
+        // Hàm hiển thị ảnh trong popup
+        function showPopupImage(index){
+            if(index < 0) index = thumbnails.length - 1;
+            if(index >= thumbnails.length) index = 0;
+            currentIndex = index;
+
+            popupImg.src = thumbnails[index].src;
+            mainImage.src = thumbnails[index].src;
+
+            // highlight thumbnail
+            thumbnails.forEach((t, i) => t.classList.toggle('active', i === index));
+        }
+
+        thumbnails.forEach((thumb, index) => {
+            if(index === 0) thumb.classList.add('active'); // ảnh đầu mặc định active
+
+            // Click vào thumbnail cập nhật main image
+            thumb.addEventListener('click', function() {
+                mainImage.src = this.src;
+                thumbnails.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                currentIndex = index;
+
+                // Mở popup khi click thumbnail
+                popup.style.display = 'flex';
+                showPopupImage(currentIndex);
+            });
+        });
+
+
+        // Prev/Next
+        prevBtn.addEventListener('click', () => showPopupImage(currentIndex - 1));
+        nextBtn.addEventListener('click', () => showPopupImage(currentIndex + 1));
+    });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('feedbackContainer');
+            const feedbacks = Array.from(container.querySelectorAll('.feedback-card'));
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+            const pageInfo = document.getElementById('pageInfo');
+            const maxHeight = 500; // chiều cao tối đa mỗi trang
+            let pages = [];
+            let currentPage = 0;
+
+            // Tạo mảng pages dựa trên chiều cao
+            function paginate() {
+                pages = [];
+                let page = [];
+                let height = 0;
+
+                feedbacks.forEach(f => {
+                    f.style.display = 'block'; // đo chiều cao
+                    const fHeight = f.offsetHeight + 16; // + margin-bottom 16px
+                    if (height + fHeight > maxHeight && page.length > 0) {
+                        pages.push(page);
+                        page = [];
+                        height = 0;
+                    }
+                    page.push(f);
+                    height += fHeight;
+                });
+
+                if (page.length > 0) pages.push(page);
+
+                showPage(0);
+            }
+
+            // Hiển thị trang
+            function showPage(index) {
+                currentPage = index;
+                feedbacks.forEach(f => f.style.display = 'none');
+                pages[index].forEach(f => f.style.display = 'block');
+                pageInfo.textContent = `${index + 1} / ${pages.length}`;
+            }
+
+            prevBtn.addEventListener('click', () => {
+                if (currentPage > 0) showPage(currentPage - 1);
+            });
+
+            nextBtn.addEventListener('click', () => {
+                if (currentPage < pages.length - 1) showPage(currentPage + 1);
+            });
+
+            paginate();
+
+            // Nếu window resize, tính lại
+            window.addEventListener('resize', () => {
+                paginate();
+            });
+        });
+    </script>
+
+    <script>
+        // Toàn bộ logic gốc: giữ nguyên
+        document.getElementById("addToCartBtn")?.addEventListener("click", () => {
+            const productId = @Model.Product.IdProduct;
+            const quantity = parseInt(document.getElementById("quantityInput").value);
+            fetch("/Cart/AddToCart", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `IdProduct=${productId}&quantity=${quantity}`
+            })
+            .then(r => r.json())
+            .then(d => {
+                const msg = document.getElementById("cartMessage");
+                msg.textContent = d.message;
+                msg.style.display = "block";
+                setTimeout(() => msg.style.display = "none", 2000);
+                updateCartCount(d.cartCount);
+            });
+        });
+
+        const stars = document.querySelectorAll('#starRating .star');
+        const ratingInput = document.getElementById('ratingInput');
+        stars.forEach(star => {
+            star.addEventListener('click', function () {
+                const val = parseInt(this.dataset.value);
+                ratingInput.value = val;
+                stars.forEach(s => {
+                    s.classList.toggle('bi-star-fill', parseInt(s.dataset.value) <= val);
+                    s.classList.toggle('bi-star', parseInt(s.dataset.value) > val);
+                });
+            });
+        });
+
+        document.getElementById("submitFeedbackBtn")?.addEventListener("click", async e => {
+            e.preventDefault();
+            const rating = parseInt(ratingInput.value);
+            const content = document.getElementById("contentInput").value.trim();
+            const token = document.querySelector('#feedbackForm input[name="__RequestVerificationToken"]').value;
+            const productId = @Model.Product.IdProduct;
+            if (!content || rating === 0) return alert("Vui lòng nhập nội dung và chọn số sao.");
+            const res = await fetch("/Product/AddFeedback", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `__RequestVerificationToken=${token}&productId=${productId}&rating=${rating}&content=${encodeURIComponent(content)}`
+            });
+            const data = await res.json();
+            if (!data.success) return alert(data.message);
+            location.reload();
+        });
+
+        document.addEventListener('click', e => {
+            if (e.target.classList.contains('reply-toggle')) {
+                const id = e.target.dataset.id;
+                const form = document.querySelector(`.reply-form[data-feedback-id="${id}"]`);
+                form?.classList.toggle('d-none');
+            }
+            if (e.target.classList.contains('cancel-reply')) {
+                e.target.closest('.reply-form').classList.add('d-none');
+            }
+        });
+
+        document.addEventListener('submit', async e => {
+            if (!e.target.classList.contains('reply-form')) return;
+            e.preventDefault();
+            const form = e.target;
+            const id = form.dataset.feedbackId;
+            const content = form.querySelector('.reply-content').value.trim();
+            const token = form.querySelector('input[name="__RequestVerificationToken"]').value;
+            if (!content) return alert("Vui lòng nhập phản hồi.");
+            const res = await fetch("/Product/ReplyFeedback", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `__RequestVerificationToken=${token}&feedbackId=${id}&replyContent=${encodeURIComponent(content)}`
+            });
+            const d = await res.json();
+            if (!d.success) return alert(d.message);
+            location.reload();
+        });
+
+        document.addEventListener('click', async e => {
+            if (!e.target.closest('.like-btn')) return;
+            const btn = e.target.closest('.like-btn');
+            const feedbackId = btn.dataset.id;
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const res = await fetch("/Product/LikeFeedback", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: `__RequestVerificationToken=${token}&feedbackId=${feedbackId}`
+            });
+            const d = await res.json();
+            if (!d.success) return alert(d.message);
+            btn.innerHTML = `<i class="bi bi-hand-thumbs-up"></i> Thích (${d.likeCount})`;
+            btn.disabled = true;
+        });
+    </script>
+}

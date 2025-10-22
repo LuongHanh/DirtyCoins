@@ -1,0 +1,698 @@
+﻿@model IEnumerable<DirtyCoins.ViewModels.ProductViewModel>
+@{
+    ViewData["Title"] = "DirtyCoins Collection — Daylight Neon";
+    Layout = "_Layout";
+    var categories = ViewBag.Categories as List<DirtyCoins.Models.Category>;
+    var q = Context.Request.Query["q"];
+    var categoryId = Context.Request.Query["categoryId"];
+    var priceRange = ViewBag.SelectedPriceRange as string ?? "";
+    var rnd = new Random();
+}
+
+<!-- ====================== SUPER LONG STYLES & MARKUP ====================== -->
+<style>
+    /* -------------------- THEME VARIABLES -------------------- */
+    :root {
+        --dc-yellow: #ffcc33;
+        --dc-accent: #ffd980;
+        --dc-dark: #222;
+        --dc-cream: #fffaf0;
+        --dc-soft: #f7f7f9;
+        --dc-glow: 0 10px 40px rgba(255,200,50,0.18);
+        --transition: 0.28s cubic-bezier(.2,.9,.3,1);
+    }
+
+    /* -------------------- WRAPPER -------------------- */
+    .product-chaos-wrap {
+        background: radial-gradient(circle at 20% 10%, #fffefb 0%, #fff9ec 30%, #fff4d9 70%, #f3efe7 100%);
+        padding: 64px 0 0px;
+        position: relative;
+        overflow: visible;
+        font-family: 'Inter', sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+
+        /* -------------------- DECORATIVE LAYERS -------------------- */
+        .product-chaos-wrap .bg-glow {
+            position: absolute;
+            pointer-events: none;
+            z-index: 0;
+            width: 680px;
+            height: 680px;
+            border-radius: 50%;
+            left: -180px;
+            top: -120px;
+            background: radial-gradient(circle at 30% 30%, rgba(255,214,102,0.35), transparent 40%);
+            filter: blur(60px);
+            transform: rotate(12deg);
+            opacity: 0.95;
+        }
+
+        .product-chaos-wrap .bg-glow-2 {
+            position: absolute;
+            right: -150px;
+            bottom: -160px;
+            z-index: 0;
+            width: 520px;
+            height: 520px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 70% 40%, rgba(162,199,255,0.45), transparent 40%);
+            filter: blur(70px);
+        }
+
+    /* floating sparks */
+    .spark {
+        position: absolute;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background: radial-gradient(circle, #fff3c4, #ffd26a 50%, rgba(255,210,120,0) 70%);
+        filter: blur(6px);
+        opacity: 0.85;
+        z-index: 1;
+        transform-origin: center;
+        animation: sparkFloat 8s ease-in-out infinite;
+    }
+    @@keyframes sparkFloat {
+        0%
+
+    {
+        transform: translateY(0) scale(1);
+        opacity: 0.7;
+    }
+
+    50% {
+        transform: translateY(-22px) scale(1.25);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 0.7;
+    }
+
+    }
+
+    /* -------------------- HERO -------------------- */
+    .chaos-hero {
+        z-index: 3;
+        position: relative;
+        text-align: center;
+        margin-bottom: 28px;
+        transform: rotate(-1deg);
+    }
+
+        .chaos-hero h1 {
+            display: inline-block;
+            padding: 18px 48px;
+            border-radius: 14px;
+            background: linear-gradient(90deg, #fff8e6, #fff2d1);
+            color: var(--dc-dark);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 42px;
+            letter-spacing: 1.8px;
+            box-shadow: 0 18px 50px rgba(255,200,50,0.12), 0 2px 8px rgba(0,0,0,0.06);
+            transform: translateZ(0);
+        }
+
+    /* -------------------- FILTER RAIL (LEFT) -------------------- */
+    .filter-rail {
+        position: fixed;
+        left: 28px;
+        top: 96px;
+        width: 240px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,250,235,0.9));
+        border-radius: 20px;
+        padding: 18px;
+        z-index: 10;
+        box-shadow: var(--dc-glow);
+        border: 1px solid rgba(255,210,80,0.18);
+        transition: transform var(--transition), box-shadow var(--transition);
+        backdrop-filter: blur(6px);
+    }
+
+        .filter-rail:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 30px 80px rgba(255,200,60,0.18);
+        }
+
+        .filter-rail h4 {
+            margin: 0 0 10px 0;
+            font-size: 0.95rem;
+            color: var(--dc-dark);
+            font-weight: 700;
+        }
+
+        .filter-rail .search {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .filter-rail input[type="text"] {
+            width: 100%;
+            border-radius: 999px;
+            padding: 10px 14px;
+            border: 1px solid rgba(220,180,40,0.18);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.6);
+        }
+
+        .filter-rail .btn {
+            border-radius: 999px;
+            padding: 8px 12px;
+            background: transparent;
+            border: 1px solid rgba(0,0,0,0.06);
+            cursor: pointer;
+            transition: all var(--transition);
+        }
+
+            .filter-rail .btn:hover {
+                background: var(--dc-accent);
+                transform: translateY(-3px);
+                box-shadow: var(--dc-glow);
+            }
+
+        .filter-rail .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+            .filter-rail .filters a {
+                text-decoration: none;
+                padding: 6px 10px;
+                border-radius: 999px;
+                color: var(--dc-dark);
+                background: rgba(255,255,255,0.9);
+                border: 1px solid rgba(0,0,0,0.04);
+                font-size: 0.82rem;
+            }
+
+                .filter-rail .filters a.active {
+                    background: linear-gradient(90deg,#fff0c8,#ffd98a);
+                    box-shadow: var(--dc-glow);
+                    color: #111;
+                    border-color: transparent;
+                    transform: scale(1.03);
+                }
+
+    /* -------------------- STAGE & GRID -------------------- */
+    .deck-stage {
+        margin-left: 300px;
+        perspective: 1800px;
+        transform-style: preserve-3d;
+        position: relative;
+        z-index: 3;
+        min-height: auto; 
+        padding: 12px 36px 36px; 
+        overflow: visible;
+    }
+
+    .deck {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 48px;
+        align-items: start;
+    }
+
+    /* -------------------- POSTER CARD (3D glass) -------------------- */
+    .poster {
+        width: 100%;
+        max-width: 200px;
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,250,240,0.8));
+        border: 1px solid rgba(220,180,50,0.12);
+        box-shadow: 0 22px 60px rgba(0,0,0,0.06);
+        overflow: hidden;
+        transform-style: preserve-3d;
+        transition: transform 0.35s cubic-bezier(.2,1,.2,1), box-shadow 0.35s;
+        position: relative;
+        cursor: grab;
+        opacity: 0;
+        will-change: transform, opacity;
+    }
+
+        .poster.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .poster .media {
+            height: 70%;
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
+            background: #eee;
+        }
+
+        .poster img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            transition: transform 0.9s cubic-bezier(.2,1,.2,1);
+            transform-origin: center;
+        }
+
+        .poster .plaque {
+            padding: 14px;
+            height: 150px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(255,250,240,0.9));
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+    .plaque h3 {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 1.15rem;
+        margin: 0;
+        color: var(--dc-dark);
+        letter-spacing: 0.6px;
+    }
+
+    .price {
+        color: #ff9c2f;
+        font-weight: 800;
+        font-size: 1.05rem;
+    }
+
+    .actions {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: flex-end;
+    }
+
+    /* Buttons */
+    .btn-sticker {
+        border-radius: 999px;
+        padding: 8px 12px;
+        font-weight: 700;
+        cursor: pointer;
+        border: none;
+        box-shadow: none;
+        transition: all .22s;
+    }
+
+        .btn-sticker.buy {
+            background: linear-gradient(90deg,#ffd76a,#ffb84d);
+            color: #111;
+        }
+
+        .btn-sticker.view {
+            background: rgba(0,0,0,0.04);
+            color: var(--dc-dark);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+    .poster:hover {
+        transform: translateY(-10px) rotateX(0deg) rotateY(0deg) scale(1.04);
+        box-shadow: 0 36px 90px rgba(255,190,60,0.12);
+    }
+
+        .poster:hover img {
+            transform: scale(1.12);
+        }
+
+    /* ribbon */
+    .ribbon {
+        position: absolute;
+        left: -18px;
+        top: 14px;
+        transform: rotate(-20deg);
+        padding: 6px 18px;
+        background: #fff6e4;
+        color: #111;
+        font-weight: 800;
+        border-radius: 6px;
+        box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    }
+
+    /* subtle badge on top-right */
+    .badge-top {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        background: linear-gradient(90deg,#fff,#ffeaa0);
+        padding: 6px 10px;
+        border-radius: 12px;
+        font-weight: 700;
+        color: #222;
+        border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    /* -------------------- HELPERS & ANIMATIONS -------------------- */
+    @@keyframes revealUp {
+        0%
+
+    {
+        transform: translateY(18px) scale(.98);
+        opacity: 0;
+    }
+
+    100% {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+
+    }
+
+    /* stagger reveal on .poster.show - JS will add show with delay */
+    .poster.show {
+        animation: revealUp .6s cubic-bezier(.2,.9,.3,1) both;
+    }
+
+    /* -------------------- RESPONSIVE -------------------- */
+    @@media (max-width: 1100px) {
+        .filter-rail
+
+    {
+        display: flex;
+        position: static;
+        width: auto;
+        margin: 0 20px 18px;
+        justify-content: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+
+    }
+
+    /* -------------------- EXTRA: floating mini-controls -------------------- */
+    .deck-controls {
+        position: fixed;
+        right: 26px;
+        top: 110px;
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+        .deck-controls button {
+            background: linear-gradient(90deg,#fff8e0,#fff2d0);
+            border: 1px solid rgba(0,0,0,0.04);
+            padding: 8px 12px;
+            border-radius: 999px;
+            box-shadow: 0 10px 30px rgba(255,200,50,0.08);
+            cursor: pointer;
+        }
+</style>
+
+<div class="product-chaos-wrap">
+    <div class="bg-glow"></div>
+    <div class="bg-glow-2"></div>
+
+    <!-- decorative sparks -->
+    <div class="spark" style="top:8%; left:18%; animation-duration:7s;"></div>
+    <div class="spark" style="top:32%; left:82%; animation-duration:9s; animation-delay:1s;"></div>
+    <div class="spark" style="top:62%; left:42%; animation-duration:6s; animation-delay:2s;"></div>
+    <div class="spark" style="top:18%; left:56%; width:8px; height:8px; animation-duration:5s; animation-delay:.6s;"></div>
+
+    <!-- hero -->
+    <div class="chaos-hero">
+        <h1>DIRTYCOINS STREET DAYLIGHT</h1>
+    </div>
+
+    <!-- left rail filters -->
+    <div class="filter-rail" id="filterRail">
+        <h4>Tìm kiếm & Lọc</h4>
+        <div class="search">
+            <input id="searchInput" type="text" placeholder="Tìm sản phẩm..." value="@q" />
+        </div>
+        <div class="mt-2">
+            <div class="fw-bold small mb-2">Danh mục</div>
+            <div class="filters">
+                <a href="#" class="categoryFilter @(string.IsNullOrEmpty(categoryId) ? "active" : "")" data-id="">Tất cả</a>
+                @foreach (var cat in categories ?? new())
+                {
+                    <a href="#" class="categoryFilter @(categoryId == cat.IdCategory.ToString() ? "active" : "")" data-id="@cat.IdCategory">@cat.Name</a>
+                }
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <div class="fw-bold small mb-2">Khoảng giá</div>
+            <div class="filters">
+                <a href="#" class="priceFilter @(string.IsNullOrEmpty(priceRange) ? "active" : "")" data-range="">Tất cả</a>
+                <a href="#" class="priceFilter @(priceRange == "0-500" ? "active" : "")" data-range="0-500">0 - 500k</a>
+                <a href="#" class="priceFilter @(priceRange == "500-1000" ? "active" : "")" data-range="500-1000">500k - 1tr</a>
+                <a href="#" class="priceFilter @(priceRange == "1000-5000" ? "active" : "")" data-range="1000-5000">1 - 5tr</a>
+                <a href="#" class="priceFilter @(priceRange == "5000+" ? "active" : "")" data-range="5000+">5tr+</a>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <div class="fw-bold small mb-2">Sắp xếp</div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                <button class="btn sortBtn" data-sort="popular">Phổ biến</button>
+                <button class="btn sortBtn" data-sort="new">Mới</button>
+                <button class="btn sortBtn" data-sort="price-asc">Giá ↑</button>
+                <button class="btn sortBtn" data-sort="price-desc">Giá ↓</button>
+            </div>
+        </div>
+
+        <div class="mt-3 text-center">
+            <button id="btnReset" class="btn" style="width:100%;">Đặt lại</button>
+        </div>
+    </div>
+
+    <!-- deck stage -->
+    <div class="deck-stage">
+        <div class="deck" id="productContainer">
+            @* Render posters (we keep markup consistent with earlier partials but now all in this view) *@
+            @{
+                @Html.AntiForgeryToken()
+                int idx = 0;
+                foreach (var p in Model ?? Enumerable.Empty<DirtyCoins.ViewModels.ProductViewModel>())
+                {
+                    idx++;
+                    var rot = rnd.Next(-10, 10);
+                    var z = rnd.Next(-40, 40);
+                    var ty = rnd.Next(-10, 12);
+                    var badge = (idx % 7 == 0) ? "HOT" : (idx % 5 == 0 ? "SALE" : "");
+                    <div class="poster" data-index="@idx" style="--rot:@(rot)deg; transform: rotateZ(@(rot)deg) translateY(@(ty)px) translateZ(@(z)px);">
+                        @if (!string.IsNullOrEmpty(badge))
+                        {
+                            <div class="badge-top">@badge</div>
+                        }
+                        <div class="ribbon">NEW</div>
+                        <div class="media">
+                            <img loading="lazy" src="@((p?.Image) ?? "/images/placeholder.png")" alt="@p.Name" />
+                        </div>
+                        <div class="plaque">
+                            <div>
+                                <h3>@p.Name</h3>
+                                @if (p.DiscountPercent > 0)
+                                {
+                                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                                        <div class="price">@p.DiscountedPrice.ToString("N0") ₫</div>
+                                        <small class="text-decoration-line-through">@p.Price.ToString("N0") ₫</small>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="price">@p.Price.ToString("N0") ₫</div>
+                                }
+                                <div class="small text-muted">@(p.Description?.Length > 80 ? p.Description.Substring(0, 80) + "…" : p.Description)</div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn-sticker buy" onclick="buyNow(@(p.IdProduct))">MUA</button>
+                                <a class="btn-sticker view" href="@Url.Action("Details", "Product", new { id = (p.IdProduct) })">XEM</a>
+                            </div>
+                        </div>
+                    </div>  
+                }
+            }
+        </div>
+    </div>
+    <footer id="pageFooter">
+        <!-- footer content -->
+    </footer>
+</div>
+
+<!-- ====================== LONG INTERACTIVE JS ====================== -->
+@section Scripts {
+    <script>
+            window.addEventListener('scroll', function() {
+            const filter = document.getElementById('filterRail');
+            const footer = document.getElementById('pageFooter');
+            const filterHeight = filter.offsetHeight;
+            const footerTop = footer.getBoundingClientRect().top + window.scrollY;
+            const scrollY = window.scrollY;
+
+            const offset = 70; // khoảng cách từ footer
+
+            if (scrollY + filterHeight + offset > footerTop) {
+                // Đẩy filter lên để không che footer
+                filter.style.top = (footerTop - scrollY - filterHeight - offset) + 'px';
+            } else {
+                // bình thường
+                filter.style.top = '96px';
+            }
+        });
+
+        const apiFilterUrl = '@Url.Action("FilterProducts", "Product")';
+        const addToCartUrl = '@Url.Action("AddToCart", "Cart")';
+        const deck = document.getElementById('productContainer');
+
+        /* ====================== Lazy reveal ====================== */
+        function lazyReveal() {
+            const posters = Array.from(document.querySelectorAll('.poster'));
+            const io = new IntersectionObserver((entries, obs) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const el = entry.target;
+                        const delay = (parseInt(el.dataset.index || "0") % 8) * 60;
+                        setTimeout(() => el.classList.add('show'), delay);
+                        obs.unobserve(el);
+                    }
+                });
+            }, { threshold: 0.08 });
+            posters.forEach(p => io.observe(p));
+        }
+
+        /* ====================== Filter/Search ====================== */
+        function loadProducts(categoryId, priceRange, q) {
+            $.get(apiFilterUrl, { categoryId, priceRange, q }, function (data) {
+                $('#productContainer').fadeOut(150, function () {
+                    $(this).html(data).fadeIn(250);
+                    // reinit scripts after reload
+                    initPosterInteractions();
+                    bindQuickBuyForms();
+                    lazyReveal();
+                });
+            });
+        }
+
+        /* ====================== Click filters ====================== */
+        $(document).on('click', '.categoryFilter', function (e) {
+            e.preventDefault();
+            $('.categoryFilter').removeClass('active');
+            $(this).addClass('active');
+            const categoryId = $(this).data('id') || '';
+            const priceRange = $('.priceFilter.active').data('range') || '';
+            const q = $('#searchInput').val() || '';
+            loadProducts(categoryId, priceRange, q);
+        });
+
+        $(document).on('click', '.priceFilter', function (e) {
+            e.preventDefault();
+            $('.priceFilter').removeClass('active');
+            $(this).addClass('active');
+            const priceRange = $(this).data('range') || '';
+            const categoryId = $('.categoryFilter.active').data('id') || '';
+            const q = $('#searchInput').val() || '';
+            loadProducts(categoryId, priceRange, q);
+        });
+
+        $('#searchForm').on('submit', function (e) {
+            e.preventDefault();
+            const q = $('#searchInput').val() || '';
+            const categoryId = $('.categoryFilter.active').data('id') || '';
+            const priceRange = $('.priceFilter.active').data('range') || '';
+            loadProducts(categoryId, priceRange, q);
+        });
+
+        /* ====================== Poster tilt / drag ====================== */
+        function initPosterInteractions() {
+            const posters = Array.from(document.querySelectorAll('.poster'));
+            posters.forEach(card => {
+                // hover tilt
+                card.onmousemove = function (e) {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    const rx = (y - rect.height / 2) / 18;
+                    const ry = (rect.width / 2 - x) / 18;
+                    card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) scale(1.03)`;
+                };
+                card.onmouseleave = function () {
+                    card.style.transform = '';
+                };
+
+                // mobile drag
+                let dragging = false, sx = 0, sy = 0;
+                card.addEventListener('touchstart', e => {
+                    dragging = true;
+                    const t = e.touches[0];
+                    sx = t.clientX; sy = t.clientY;
+                    card.style.transition = 'none';
+                });
+                card.addEventListener('touchmove', e => {
+                    if (!dragging) return;
+                    const t = e.touches[0];
+                    const dx = t.clientX - sx;
+                    const dy = t.clientY - sy;
+                    card.style.transform = `translate(${dx}px, ${dy}px) rotate(${dx / 40}deg) scale(1.05)`;
+                    card.style.zIndex = 9999;
+                });
+                card.addEventListener('touchend', () => {
+                    dragging = false;
+                    card.style.transition = '';
+                    card.style.transform = '';
+                    card.style.zIndex = '';
+                });
+            });
+        }
+
+        /* ====================== Quick Buy (POST) ====================== */
+        function bindQuickBuyForms() {
+            $(document).off('submit', '.quick-buy-form').on('submit', '.quick-buy-form', function (e) {
+                e.preventDefault();
+                const form = $(this);
+                const formData = form.serialize();
+
+                fetch(form.attr('action'), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': form.find('input[name="__RequestVerificationToken"]').val()
+                    },
+                    body: formData
+                })
+                .then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url; // ✅ chuyển hướng đúng như bản cũ
+                    } else {
+                        return response.text();
+                    }
+                })
+                .catch(err => console.error('Lỗi khi gửi form:', err));
+            });
+        }
+
+        /* ====================== Init on first load ====================== */
+        $(document).ready(function () {
+            lazyReveal();
+            initPosterInteractions();
+            bindQuickBuyForms();
+        });
+        function buyNow(productId) {
+            fetch('@Url.Action("CheckoutSingle", "Cart")', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                },
+                body: `IdProduct=${productId}&quantity=1`
+            })
+            .then(response => {
+                // Nếu server redirect (vì action trả RedirectToAction)
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    // Có thể server trả view hoặc json fallback
+                    return response.text().then(html => {
+                        document.body.innerHTML = html;
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('Lỗi khi mua ngay:', err);
+                alert('Không thể xử lý mua ngay.');
+            });
+        }
+    </script>
+
+}

@@ -1,0 +1,856 @@
+﻿@{
+    ViewData["Title"] = "Bảng điều khiển quản trị";
+}
+
+<style>
+    /* ===========================
+           DIRTYCOINS ADMIN DASHBOARD UI v2
+           =========================== */
+
+    body {
+        background: #f6f7fb;
+    }
+
+    .admin-dashboard {
+        margin: 80px auto 0px;
+        padding-bottom: 60px;
+        animation: fadeIn 0.4s ease;
+    }
+
+    h2, h4 {
+        font-weight: 700;
+        color: #222;
+    }
+
+    p {
+        color: #555;
+    }
+
+    .stat-card {
+        border-radius: 14px;
+        border: 2px solid transparent;
+        transition: all 0.25s ease;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.08);
+        }
+
+    .stat-icon {
+        font-size: 1.6rem;
+    }
+
+    /* Viền màu riêng cho từng loại */
+    .stat-border-primary {
+        border-color: #007bff;
+    }
+
+    .stat-border-success {
+        border-color: #28a745;
+    }
+
+    .stat-border-info {
+        border-color: #17a2b8;
+    }
+
+    .stat-border-warning {
+        border-color: #ffc107;
+    }
+
+    .stat-border-danger {
+        border-color: #dc3545;
+    }
+
+    .stat-border-secondary {
+        border-color: #6c757d;
+    }
+
+    /* Nền trắng, chữ đen */
+    .stat-card.bg-white {
+        background-color: #fff !important;
+        color: #212529 !important;
+    }
+
+    /* Bóng mờ nhẹ */
+    .shadow-sm {
+        box-shadow: 0 3px 6px rgba(0,0,0,0.05) !important;
+    }
+
+    .stat-card {
+        border-radius: 14px;
+        transition: all 0.25s ease;
+        font-weight: 600;
+    }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+    .stat-icon {
+        font-size: 1.6rem;
+    }
+
+    /* Màu gradient hiện đại */
+    .bg-gradient-primary {
+        background: linear-gradient(135deg, #007bff, #00bfff);
+    }
+
+    .bg-gradient-success {
+        background: linear-gradient(135deg, #28a745, #7bd88f);
+    }
+
+    .bg-gradient-info {
+        background: linear-gradient(135deg, #17a2b8, #5bc0de);
+    }
+
+    .bg-gradient-warning {
+        background: linear-gradient(135deg, #ff9f1c, #ffd166);
+    }
+
+    .bg-gradient-danger {
+        background: linear-gradient(135deg, #dc3545, #ff6f61);
+    }
+
+    .bg-gradient-secondary {
+        background: linear-gradient(135deg, #6c757d, #adb5bd);
+    }
+
+    /* Dashboard header */
+    .dashboard-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+        .dashboard-header h2 {
+            font-size: 2rem;
+            color: #111;
+        }
+
+        .dashboard-header p {
+            color: #777;
+            font-size: 0.95rem;
+        }
+
+    /* ===== CARDS ===== */
+    .card {
+        border: none;
+        border-radius: 16px;
+        transition: all 0.25s ease;
+        background: #fff;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+        }
+
+        .card h6 {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .card h3 {
+            font-weight: 800;
+            color: #222;
+        }
+
+        /* Accent cards */
+        .card.bg-success,
+        .card.bg-warning,
+        .card.bg-info,
+        .card.bg-danger {
+            color: #fff !important;
+        }
+
+    /* Quick actions */
+    .quick-actions h4 {
+        font-weight: 700;
+    }
+
+    .quick-actions .btn {
+        border-radius: 12px !important;
+        font-weight: 500;
+        padding: 10px 16px;
+        transition: all 0.2s;
+    }
+
+        .quick-actions .btn:hover {
+            transform: translateY(-2px);
+        }
+
+    .btn-outline-primary:hover {
+        background: #007bff;
+        color: #fff;
+    }
+
+    .btn-outline-success:hover {
+        background: #28a745;
+        color: #fff;
+    }
+
+    /* ====== ALERT ====== */
+    .alert {
+        border-radius: 14px;
+        border: none;
+        box-shadow: 0 6px 20px rgba(255,193,7,0.2);
+        animation: fadeIn 0.4s ease;
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, #fff8e1, #fff0c2);
+        color: #6a4c00;
+    }
+
+    /* ===== MODALS ===== */
+    .modal-content {
+        border-radius: 18px;
+        border: none;
+        overflow: hidden;
+        backdrop-filter: blur(8px);
+        background: rgba(255,255,255,0.95);
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        animation: zoomIn 0.25s ease;
+        margin-top: 60px;
+    }
+
+    .modal-header {
+        border: none;
+        padding: 18px 24px;
+    }
+
+    .modal-title {
+        font-weight: 700;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 1rem 1.5rem;
+    }
+
+    .modal .btn {
+        border-radius: 10px !important;
+    }
+
+    .modal .btn-warning {
+        background: linear-gradient(135deg, #ffc107, #ff9800);
+        color: #000;
+        border: none;
+        font-weight: 600;
+    }
+
+        .modal .btn-warning:hover {
+            filter: brightness(0.9);
+        }
+
+    /* Inputs inside modal */
+    .modal input, .modal textarea {
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        transition: 0.2s;
+    }
+
+        .modal input:focus, .modal textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+        }
+
+    /* Spinner + Message inside modal */
+    #modalMessage .spinner-border {
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+
+    #modalMessage span {
+        font-weight: 500;
+        color: #333;
+    }
+
+    /* Animation */
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    @@keyframes zoomIn {
+        from
+
+    {
+        transform: scale(0.92);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    }
+
+    .quick-actions .card {
+        border-radius: 14px;
+        transition: all 0.25s;
+    }
+
+        .quick-actions .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+        }
+
+    .quick-actions .btn {
+        border-radius: 10px !important;
+        font-weight: 500;
+    }
+
+</style>
+
+
+<div class="admin-dashboard container">
+    @Html.AntiForgeryToken()
+
+    @* ⚠️ Nếu đang bảo trì *@
+    @{
+        var maintenancePath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "maintenance.json");
+        if (System.IO.File.Exists(maintenancePath))
+        {
+            var json = System.IO.File.ReadAllText(maintenancePath);
+            using var doc = System.Text.Json.JsonDocument.Parse(json);
+            var root = doc.RootElement;
+
+            var start = root.GetProperty("StartTime").GetDateTime();
+            var end = root.GetProperty("EndTime").GetDateTime();
+            var reason = root.GetProperty("Reason").GetString();
+
+            <div class="alert alert-warning text-center fw-bold mb-4">
+                ⚠️ Hệ thống đang trong chế độ bảo trì từ
+                @start.ToString("HH:mm dd/MM") đến @end.ToString("HH:mm dd/MM")<br />
+                📝 @reason
+            </div>
+            ;
+        }
+    }
+
+    <div class="dashboard-header">
+        <h2>🛠️ Quản trị hệ thống DirtyCoins</h2>
+        <p>Chào mừng quản trị viên! Đây là bảng điều khiển trung tâm.</p>
+    </div>
+
+    <!-- Thống kê tổng quan -->
+    <section class="mt-4">
+        <h4 class="mb-3 fw-bold">📊 Thông tin hệ thống</h4>
+        <div class="row g-3">
+            <div class="col-6 col-md-2">
+                <div class="stat-card text-center p-3 bg-gradient-primary text-white shadow-sm">
+                    <div class="stat-icon mb-1">🏪</div>
+                    <div class="fw-semibold small">Cửa hàng</div>
+                    <h3 class="fw-bold">@ViewBag.TotalStores</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="stat-card text-center p-3 bg-gradient-success text-white shadow-sm">
+                    <div class="stat-icon mb-1">📦</div>
+                    <div class="fw-semibold small">Sản phẩm</div>
+                    <h3 class="fw-bold">@ViewBag.TotalProducts</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="stat-card text-center p-3 bg-gradient-info text-white shadow-sm">
+                    <div class="stat-icon mb-1">👤</div>
+                    <div class="fw-semibold small">Người dùng</div>
+                    <h3 class="fw-bold">@ViewBag.TotalUsers</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="stat-card text-center p-3 bg-gradient-warning text-white shadow-sm">
+                    <div class="stat-icon mb-1">👥</div>
+                    <div class="fw-semibold small">Nhân viên</div>
+                    <h3 class="fw-bold">@ViewBag.TotalEmployees</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="stat-card text-center p-3 bg-gradient-danger text-white shadow-sm">
+                    <div class="stat-icon mb-1">🎯</div>
+                    <div class="fw-semibold small">Director</div>
+                    <h3 class="fw-bold">@ViewBag.TotalDirectors</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="stat-card text-center p-3 bg-gradient-secondary text-white shadow-sm">
+                    <div class="stat-icon mb-1">🔑</div>
+                    <div class="fw-semibold small">Admin</div>
+                    <h3 class="fw-bold">@ViewBag.TotalAdmins</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Lượng truy cập -->
+    <section class="mt-5">
+        <h4 class="mb-3 fw-bold">🌐 Lượng truy cập hiện tại</h4>
+        <div class="row g-3">
+            <div class="col-6 col-md-2">
+                <div class="stat-card stat-border-primary text-center p-3 bg-white shadow-sm">
+                    <div class="stat-icon mb-1">🟢</div>
+                    <div class="fw-semibold small text-dark">Tổng online</div>
+                    <h3 id="totalOnline" class="fw-bold text-dark">0</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="stat-card stat-border-success text-center p-3 bg-white shadow-sm">
+                    <div class="stat-icon mb-1">👤</div>
+                    <div class="fw-semibold small text-dark">Customer</div>
+                    <h3 id="onlineCustomer" class="fw-bold text-dark">0</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="stat-card stat-border-info text-center p-3 bg-white shadow-sm">
+                    <div class="stat-icon mb-1">👥</div>
+                    <div class="fw-semibold small text-dark">Staff</div>
+                    <h3 id="onlineStaff" class="fw-bold text-dark">0</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="stat-card stat-border-warning text-center p-3 bg-white shadow-sm">
+                    <div class="stat-icon mb-1">🏪</div>
+                    <div class="fw-semibold small text-dark">StoreOwner</div>
+                    <h3 id="onlineStoreOwner" class="fw-bold text-dark">0</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="stat-card stat-border-danger text-center p-3 bg-white shadow-sm">
+                    <div class="stat-icon mb-1">🎯</div>
+                    <div class="fw-semibold small text-dark">Director</div>
+                    <h3 id="onlineDirector" class="fw-bold text-dark">0</h3>
+                </div>
+            </div>
+            <div class="col-6 col-md-2">
+                <div class="stat-card stat-border-secondary text-center p-3 bg-white shadow-sm">
+                    <div class="stat-icon mb-1">🔑</div>
+                    <div class="fw-semibold small text-dark">Admin</div>
+                    <h3 id="onlineAdmin" class="fw-bold text-dark">0</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions mt-4">
+        <h4 class="mb-3">⚡ Chức năng nhanh</h4>
+
+        <div class="row g-3">
+            <div class="col-lg-4 col-md-6">
+                <div class="card p-3 shadow-sm">
+                    <h6 class="fw-bold mb-2 text-primary">🧭 Quản trị chung</h6>
+                    <div class="d-grid gap-2">
+                        <a href="@Url.Action("UserManagement", "Admin")" class="btn btn-outline-primary">👥 Quản lý tài khoản</a>
+                        <a href="@Url.Action("SystemLog", "Admin")" class="btn btn-outline-success">📜 Nhật ký hệ thống</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="card p-3 shadow-sm">
+                    <h6 class="fw-bold mb-2 text-warning">⚙️ Stored Procedures</h6>
+                    <div class="d-grid gap-2">
+                        <button id="btnRunAll" class="btn btn-success">🔄 Chạy toàn bộ</button>
+                        <button id="btnRunAddImported" class="btn btn-outline-info">📦 Nhập kho</button>
+                        <button id="btnRunStoreReport" class="btn btn-outline-warning">🏪 Báo cáo cửa hàng</button>
+                        <button id="btnRunInventory" class="btn btn-outline-secondary">📊 Tồn kho tháng</button>
+                        <button id="btnRunRank" class="btn btn-outline-dark">⭐ Hạng khách hàng</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <div class="card p-3 shadow-sm">
+                    <h6 class="fw-bold mb-2 text-danger">🛰️ Hệ thống & Bảo trì</h6>
+                    <div class="d-grid gap-2">
+                        <button id="btnUpdateStores" class="btn btn-info text-white">📍 Cập nhật toạ độ cửa hàng</button>
+                        <button id="btnUpdateCustomers" class="btn btn-warning">📍 Cập nhật toạ độ khách hàng</button>
+                        <button id="btnStopSystem" class="btn btn-danger">⛔ Dừng hệ thống</button>
+                        <button id="btnRestartSystem" class="btn btn-secondary">♻️ Khởi động lại</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        async function loadOnlineStats() {
+            try {
+                const res = await fetch("/api/admin/online-stats");
+                const data = await res.json();
+
+                // Tổng
+                document.getElementById("totalOnline").innerText = data.totalOnline;
+
+                // Reset về 0 trước
+                document.getElementById("onlineCustomer").innerText = 0;
+                document.getElementById("onlineStaff").innerText = 0;
+                document.getElementById("onlineStoreOwner").innerText = 0;
+                document.getElementById("onlineDirector").innerText = 0;
+                document.getElementById("onlineAdmin").innerText = 0;
+
+                // Gán theo role
+                data.byRole.forEach(r => {
+                    switch (r.role) {
+                        case "Customer":
+                            document.getElementById("onlineCustomer").innerText = r.count; break;
+                        case "Staff":
+                            document.getElementById("onlineStaff").innerText = r.count; break;
+                        case "StoreOwner":
+                            document.getElementById("onlineStoreOwner").innerText = r.count; break;
+                        case "Director":
+                            document.getElementById("onlineDirector").innerText = r.count; break;
+                        case "Admin":
+                            document.getElementById("onlineAdmin").innerText = r.count; break;
+                    }
+                });
+            } catch (err) {
+                console.error("❌ Lỗi load online stats:", err);
+            }
+        }
+
+        // Load ban đầu + cập nhật 5s/lần
+        loadOnlineStats();
+        setInterval(loadOnlineStats, 5000);
+    </script>
+
+<!-- Modal hiển thị kết quả -->
+<div class="modal fade" id="resultModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">🔔 Trạng thái xử lý</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center" id="modalMessage"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal nhập thông tin bảo trì -->
+<div class="modal fade" id="maintenanceModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title">🛠️ Thiết lập thời gian bảo trì</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="maintenanceForm">
+                    <div class="mb-3">
+                        <label class="form-label">⏰ Thời gian bắt đầu</label>
+                        <input type="datetime-local" id="startTime" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">⏰ Thời gian kết thúc</label>
+                        <input type="datetime-local" id="endTime" class="form-control" required />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">📝 Lý do bảo trì</label>
+                        <textarea id="reason" class="form-control" rows="2" placeholder="Ví dụ: Nâng cấp server, sửa lỗi..."></textarea>
+                    </div>
+                    <div class="form-check mt-3">
+                        <input type="checkbox" id="isImportant" class="form-check-input" />
+                        <label for="isImportant" class="form-check-label text-danger fw-semibold">
+                            🔥 Đây là bảo trì quan trọng (ngắt kết nối toàn hệ thống)
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button id="btnConfirmMaintenance" class="btn btn-warning">🚀 Bắt đầu bảo trì</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Lấy token antiforgery
+            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            const antiToken = tokenInput ? tokenInput.value : null;
+
+            // Modal instances (khởi tạo 1 lần)
+            const maintenanceModalEl = document.getElementById("maintenanceModal");
+            const resultModalEl = document.getElementById("resultModal");
+            const maintenanceModal = maintenanceModalEl ? new bootstrap.Modal(maintenanceModalEl) : null;
+            const resultModal = resultModalEl ? new bootstrap.Modal(resultModalEl) : null;
+
+            // Các nút
+            const btnRunAll = document.getElementById("btnRunAll");
+            const btnUpdateStores = document.getElementById("btnUpdateStores");
+            const btnUpdateCustomers = document.getElementById("btnUpdateCustomers");
+            const btnStopSystem = document.getElementById("btnStopSystem");
+            const btnRestartSystem = document.getElementById("btnRestartSystem");
+            const btnConfirmMaintenance = document.getElementById("btnConfirmMaintenance");
+
+            // Biểu tượng modal message
+            const modalMessageEl = document.getElementById("modalMessage");
+
+            function showLoading(message = "⏳ Đang xử lý, vui lòng chờ...") {
+                if (!modalMessageEl) return;
+                modalMessageEl.innerHTML = `
+                    <div class="d-flex flex-column align-items-center">
+                        <div class="spinner-border text-primary mb-3" role="status"></div>
+                        <span>${message}</span>
+                    </div>`;
+                if (resultModal) resultModal.show();
+            }
+
+            function showResult(msg) {
+                if (!modalMessageEl) return;
+                modalMessageEl.innerHTML = `<p>${msg}</p>`;
+                if (resultModal) resultModal.show();
+            }
+
+            async function postJson(url, body) {
+                const headers = { "Content-Type": "application/json" };
+                if (antiToken) headers["RequestVerificationToken"] = antiToken;
+                const res = await fetch(url, {
+                    method: "POST",
+                    headers,
+                    body: JSON.stringify(body || {})
+                });
+                // some endpoints may not return JSON; handle errors
+                let data = {};
+                try { data = await res.json(); } catch { data = { message: res.statusText || "No JSON response" }; }
+                if (!res.ok) throw new Error(data.message || `HTTP ${res.status}`);
+                return data;
+            }
+
+            async function getJson(url) {
+                const res = await fetch(url, { method: "GET" });
+                if (!res.ok) {
+                    const txt = await res.text();
+                    throw new Error(txt || res.statusText);
+                }
+                return res.json();
+            }
+
+            // ---- BIND BUTTONS ----
+            // Run all
+            if (btnRunAll) {
+                btnRunAll.addEventListener("click", async () => {
+                    try {
+                        showLoading("🔄 Đang chạy toàn bộ stored procedure...");
+                        const data = await postJson("/api/procedure/runall", {});
+                        showResult(data.message || "✅ Hoàn thành");
+                    } catch (err) {
+                        showResult("❌ Có lỗi: " + err.message);
+                    }
+                });
+            }
+
+            // 2️⃣ Cập nhật kho nhập hàng (AddImportedToInventory)
+            const btnRunAddImported = document.getElementById("btnRunAddImported");
+            if (btnRunAddImported) {
+                btnRunAddImported.addEventListener("click", async () => {
+                    const id = prompt("Nhập ID phiếu nhập cần cập nhật (IdImported):");
+                    if (!id) return;
+                    try {
+                        showLoading("📦 Đang cập nhật kho từ phiếu nhập #" + id + "...");
+                        const data = await postJson(`/api/procedure/addimportedtoinventory/${id}`);
+                        showResult(data.message || "✅ Cập nhật thành công kho hàng!");
+                    } catch (err) {
+                        showResult("❌ Lỗi: " + err.message);
+                    }
+                });
+            }
+
+            // 3️⃣ Cập nhật báo cáo cửa hàng (sp_UpdateStoreReport)
+            const btnRunStoreReport = document.getElementById("btnRunStoreReport");
+            if (btnRunStoreReport) {
+                btnRunStoreReport.addEventListener("click", async () => {
+                    const id = prompt("Nhập ID cửa hàng cần cập nhật (IdStore):");
+                    if (!id) return;
+                    try {
+                        showLoading("🏪 Đang cập nhật báo cáo cho cửa hàng #" + id + "...");
+                        const data = await postJson(`/api/procedure/updatestorereport/${id}`);
+                        showResult(data.message || "✅ Đã cập nhật báo cáo cửa hàng!");
+                    } catch (err) {
+                        showResult("❌ Lỗi: " + err.message);
+                    }
+                });
+            }
+
+            // 4️⃣ Tổng hợp tồn kho tháng hiện tại (UpdateMonthlyInventoryAndStock)
+            const btnRunInventory = document.getElementById("btnRunInventory");
+            if (btnRunInventory) {
+                btnRunInventory.addEventListener("click", async () => {
+                    try {
+                        showLoading("📊 Đang tổng hợp tồn kho tháng hiện tại...");
+                        const data = await postJson("/api/procedure/updatemonthlyinventory");
+                        showResult(data.message || "✅ Tổng hợp tồn kho thành công!");
+                    } catch (err) {
+                        showResult("❌ Lỗi: " + err.message);
+                    }
+                });
+            }
+
+            // 5️⃣ Cập nhật hạng khách hàng (UpdateCustomerRankStats)
+            const btnRunRank = document.getElementById("btnRunRank");
+            if (btnRunRank) {
+                btnRunRank.addEventListener("click", async () => {
+                    try {
+                        showLoading("⭐ Đang cập nhật hạng khách hàng...");
+                        const data = await postJson("/api/procedure/updatecustomerrank");
+                        showResult(data.message || "✅ Cập nhật hạng khách hàng thành công!");
+                    } catch (err) {
+                        showResult("❌ Lỗi: " + err.message);
+                    }
+                });
+            }
+
+            if (btnUpdateStores) {
+                btnUpdateStores.addEventListener("click", async () => {
+                    try {
+                        showLoading("📍 Đang cập nhật tọa độ cửa hàng...");
+                        const data = await getJson("/geo/update-stores");
+                        showResult(data.message || "✅ Hoàn thành");
+                    } catch (err) {
+                        showResult("❌ Có lỗi: " + err.message);
+                    }
+                });
+            }
+
+            if (btnUpdateCustomers) {
+                btnUpdateCustomers.addEventListener("click", async () => {
+                    try {
+                        showLoading("📍 Đang cập nhật tọa độ khách hàng...");
+                        const data = await getJson("/geo/update-customers");
+                        showResult(data.message || "✅ Hoàn thành");
+                    } catch (err) {
+                        showResult("❌ Có lỗi: " + err.message);
+                    }
+                });
+            }
+
+            // Stop: mở modal nhập thời gian (KHÔNG gọi API trực tiếp)
+            if (btnStopSystem) {
+                btnStopSystem.addEventListener("click", () => {
+                    if (maintenanceModal) maintenanceModal.show();
+                });
+            }
+
+            // Xác nhận bắt đầu bảo trì (nút trong modal)
+            if (btnConfirmMaintenance) {
+                btnConfirmMaintenance.addEventListener("click", async (ev) => {
+                    ev.preventDefault();
+                    const start = document.getElementById("startTime")?.value;
+                    const end = document.getElementById("endTime")?.value;
+                    const reason = document.getElementById("reason")?.value?.trim() ?? "";
+
+                    if (!start || !end) {
+                        alert("Vui lòng nhập đầy đủ thời gian bảo trì!");
+                        return;
+                    }
+
+                    // kiểm tra thời gian hợp lệ
+                    if (new Date(start) >= new Date(end)) {
+                        alert("Thời gian kết thúc phải sau thời gian bắt đầu.");
+                        return;
+                    }
+
+                    // gọi API POST /system/stop với body
+                    try {
+                        if (maintenanceModal) maintenanceModal.hide();
+                        showLoading("🔧 Thiết lập chế độ bảo trì...");
+
+                        const payload = {
+                            StartTime: start,
+                            EndTime: end,
+                            Reason: reason || "Bảo trì hệ thống",
+                            IsImportant: document.getElementById("isImportant").checked
+                        };
+
+                        const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+
+                        const res = await fetch("/system/stop", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json",
+                                "RequestVerificationToken": token || ""
+                            },
+                            body: JSON.stringify(payload)
+                        });
+
+                        const data = await res.json();
+                        
+                        showResult(data.message || "✅ Hệ thống đã chuyển sang chế độ bảo trì.");
+                        
+                        // ✅ Nếu server trả redirectUrl, điều hướng sau 3s
+                        if (data.redirectUrl) {
+                            setTimeout(() => {
+                                window.location.href = data.redirectUrl;
+                            }, 2000);
+                        }
+                    } catch (err) {
+                        showResult("❌ Có lỗi: " + err.message);
+                    }
+                });
+            }
+
+            // Restart: xác nhận trước khi điều hướng
+            if (btnRestartSystem) {
+                btnRestartSystem.addEventListener("click", () => {
+                    const confirmRestart = confirm("⚠️ Bạn có chắc chắn muốn khởi động lại hệ thống không?\nChỉ Admin mới có quyền này.");
+                    if (confirmRestart) {
+                        window.location.href = "/system/restart-confirm";
+                    }
+                });
+            }
+
+            // Nếu bạn muốn: bind còn lại cho online stats auto-refresh
+            async function loadOnlineStats() {
+                try {
+                    const res = await fetch("/api/admin/online-stats");
+                    const data = await res.json();
+                    document.getElementById("totalOnline").innerText = data.totalOnline ?? 0;
+                    document.getElementById("onlineCustomer").innerText = 0;
+                    document.getElementById("onlineStaff").innerText = 0;
+                    document.getElementById("onlineStoreOwner").innerText = 0;
+                    document.getElementById("onlineDirector").innerText = 0;
+                    document.getElementById("onlineAdmin").innerText = 0;
+                    (data.byRole || []).forEach(r => {
+                        switch (r.role) {
+                            case "Customer": document.getElementById("onlineCustomer").innerText = r.count; break;
+                            case "Staff": document.getElementById("onlineStaff").innerText = r.count; break;
+                            case "StoreOwner": document.getElementById("onlineStoreOwner").innerText = r.count; break;
+                            case "Director": document.getElementById("onlineDirector").innerText = r.count; break;
+                            case "Admin": document.getElementById("onlineAdmin").innerText = r.count; break;
+                        }
+                    });
+                } catch (err) {
+                    console.error("Lỗi load online stats:", err);
+                }
+            }
+            // initial + interval
+            loadOnlineStats();
+            setInterval(loadOnlineStats, 5000);
+        });
+    </script>
+}

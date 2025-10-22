@@ -1,0 +1,141 @@
+﻿@model IEnumerable<DirtyCoins.Models.Order>
+@{
+    ViewData["Title"] = "Quản lý đơn hàng";
+    var statusList = new List<string> { "Đang xử lý", "Chờ giao hàng", "Đang giao hàng", "Giao hàng thành công", "Đã hủy" };
+    string selectedStatus = ViewBag.SelectedStatus ?? "";
+    var lastOp = ViewBag.LastBulkOp;
+}
+
+<div class="container dirtycoins-body mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <a href="/Staff/Dashboard" class="btn btn-outline-dark rounded-pill">⬅ Quay lại</a>
+        <h3 class="fw-bold" style="font-family:'Bebas Neue';color:var(--dc-green);">
+            ⚙ Quản lý đơn hàng
+        </h3>
+        <div></div>
+    </div>
+
+    @if (lastOp != null)
+    {
+        var rolledBack = lastOp.RolledBack == true;
+        <div class="alert @(rolledBack ? "alert-secondary" : "alert-warning") rounded-3 shadow-sm d-flex justify-content-between align-items-center">
+            <div>
+                <strong>Bulk Op #@lastOp.Id</strong> – <em>@lastOp.ActionType</em>
+                <small class="text-muted">(@((DateTime)lastOp.PerformedAt).ToLocalTime().ToString("g"))</small>
+                &nbsp;by <b>@lastOp.PerformedBy</b>
+                @if (rolledBack)
+                {
+                    <span class="badge bg-secondary ms-2">Đã hoàn lại</span>
+                    ;
+                }
+            </div>
+            @if (!rolledBack)
+            {
+                <form asp-action="RollbackBulk" method="post" onsubmit="return confirm('Hoàn lại thao tác này?');">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="opId" value="@lastOp.Id" />
+                    <button class="btn btn-outline-dark btn-sm rounded-pill">↩ Hoàn lại</button>
+                </form>
+            }
+        </div>
+    }
+
+    <!-- Bộ lọc -->
+    <form method="get" class="row g-2 align-items-end mb-4">
+        <div class="col-md-2">
+            <label class="fw-bold">Trạng thái</label>
+            <select name="status" class="form-select rounded-pill">
+                <option value="">-- Tất cả --</option>
+                @foreach (var s in statusList)
+                {
+                    <option value="@s" selected="@(s == selectedStatus)">@s</option>
+                }
+            </select>
+        </div>
+        <div class="col-md-2"><label class="fw-bold">Mã đơn</label><input name="orderCode" value="@ViewBag.OrderCode" class="form-control rounded-pill" /></div>
+        <div class="col-md-3"><label class="fw-bold">Khách hàng</label><input name="searchName" value="@ViewBag.SearchName" class="form-control rounded-pill" /></div>
+        <div class="col-md-3"><label class="fw-bold">Người nhận</label><input name="receiver" value="@ViewBag.Receiver" class="form-control rounded-pill" /></div>
+        <div class="col-md-2"><label class="fw-bold">Ngày đặt</label><input type="date" name="date" value="@ViewBag.OrderDate" class="form-control rounded-pill" /></div>
+        <div class="col-md-2 d-grid"><button class="btn bg-gold fw-semibold rounded-pill">🔍 Tìm kiếm</button></div>
+    </form>
+
+    <!-- Bulk -->
+    <form asp-action="BulkUpdate" method="post" class="mb-4 d-flex flex-wrap gap-2">
+        @Html.AntiForgeryToken()
+        <button name="actionType" value="processing_to_pending" class="btn btn-warning rounded-pill btn-sm">Xử lý → Chờ giao</button>
+        <button name="actionType" value="pending_to_shipping" class="btn btn-primary rounded-pill btn-sm">Chờ → Giao hàng</button>
+        <button name="actionType" value="rollback_one_step" class="btn btn-secondary rounded-pill btn-sm">↩ Hoàn lại 1 bước</button>
+        <a asp-action="PrintAllBills" target="_blank" class="btn bg-green text-white rounded-pill btn-sm">🧾 Xuất bill xử lý</a>
+    </form>
+
+    <div class="table-responsive shadow-sm rounded-4">
+        <table class="table align-middle text-center">
+            <thead style="background-color:var(--dc-dark);color:white;">
+                <tr>
+                    <th>#</th>
+                    <th>Mã đơn</th>
+                    <th>Khách hàng</th>
+                    <th>Người nhận</th>
+                    <th>Ngày đặt</th>
+                    <th>Tổng tiền</th>
+                    <th>Trạng thái</th>
+                    <th>Chi tiết</th>
+                    <th>Cập nhật</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int i = 1;
+                }
+                @foreach (var o in Model)
+                {
+                    var cancel = o.Status == "Đã hủy";
+                    <tr class="@(cancel ? "table-danger" : "")">
+                        <td>@i</td>
+                        <td>@o.OrderCode</td>
+                        <td>@o.Customer?.FullName</td>
+                        <td>@o.Receiver</td>
+                        <td>@o.OrderDate.ToString("dd/MM/yyyy")</td>
+                        <td class="text-end">@o.TotalAmount.ToString("N0") ₫</td>
+                        <td>
+                            <span class="badge @(o.Status switch
+                                  {
+                                      "Đang xử lý" => "bg-warning text-dark",
+                                      "Chờ giao hàng" => "bg-info text-dark",
+                                      "Đang giao hàng" => "bg-primary",
+                                      "Giao hàng thành công" => "bg-success",
+                                      "Đã hủy" => "bg-danger",
+                                      _ => "bg-secondary"
+                                  })">@o.Status</span>
+                    </td>
+                    <td>
+                        <a asp-action="PrintBill" asp-route-id="@o.IdOrder"
+                           class="btn btn-sm btn-outline-dark rounded-pill">Xem</a>
+                    </td>
+                    <td>
+                        @if (!cancel)
+                            {
+                                <form asp-action="UpdateOrderStatus" method="post" class="d-flex gap-1 justify-content-center">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="id" value="@o.IdOrder" />
+                                    <select name="status" class="form-select form-select-sm rounded-pill">
+                                        @foreach (var s in statusList)
+                                        {
+                                            <option value="@s" selected="@(o.Status == s)">@s</option>
+                                        }
+                                    </select>
+                                    <button type="submit" class="btn btn-sm bg-gold rounded-pill fw-semibold">Lưu</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <button class="btn btn-sm btn-secondary rounded-pill" disabled>Đã hủy</button>
+                            }
+                        </td>
+                    </tr>
+                    i++;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

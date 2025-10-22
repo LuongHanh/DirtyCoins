@@ -1,0 +1,147 @@
+﻿@{
+    ViewData["Title"] = "Đăng ký";
+    Layout = "_Layout";
+}
+
+<style>
+    /* ---------- REGISTER PAGE ---------- */
+    .auth-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 3rem 0;
+    }
+
+    .auth-card {
+        margin-top: 30px;
+        background: #fff;
+        padding: 2.5rem 2rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        width: 100%;
+        max-width: 600px;
+    }
+
+        .auth-card h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.2rem;
+            text-align: center;
+            color: var(--dc-dark);
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        .auth-card .btn-success {
+            background: var(--dc-green);
+            border: none;
+            border-radius: 30px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+            .auth-card .btn-success:hover {
+                background: #0b5;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            }
+
+    .dropdown-menu {
+        border-radius: 10px;
+    }
+
+    .auth-card a {
+        color: var(--dc-yellow);
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+        .auth-card a:hover {
+            text-decoration: underline;
+        }
+</style>
+
+<section class="auth-page">
+    <div class="auth-card">
+        <h3>Đăng ký tài khoản</h3>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+
+        <form asp-controller="Account" asp-action="Register" method="post">
+            @Html.AntiForgeryToken()
+
+            <div class="mb-3">
+                <label class="form-label">Họ và tên</label>
+                <input type="text" class="form-control" name="fullname" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tỉnh / Thành phố</label>
+                <div class="dropdown">
+                    <button class="btn btn-outline-dark dropdown-toggle w-100 text-start" type="button" id="provinceDropdown"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        🌆 Chọn tỉnh/thành
+                    </button>
+
+                    <ul class="dropdown-menu w-100" style="max-height: 250px; overflow-y: auto;">
+                        @{
+                            var provinces = new[] { "Hà Nội", "TP. Hồ Chí Minh", "Đà Nẵng", "Cần Thơ", "Hải Phòng",
+                                                "Bình Dương", "Đồng Nai", "Thừa Thiên Huế", "Nghệ An", "Lâm Đồng" };
+                        }
+                        @foreach (var province in provinces)
+                        {
+                            <li><a class="dropdown-item province-item" href="#" data-value="@province">@province</a></li>
+                        }
+                    </ul>
+                    <input type="hidden" name="address" id="selectedProvince" required />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Số điện thoại</label>
+                <input type="text" class="form-control" name="phone" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Tên đăng nhập *</label>
+                <input type="text" class="form-control" name="username" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mật khẩu *</label>
+                <input type="password" class="form-control" name="password" required minlength="6" />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Xác nhận mật khẩu *</label>
+                <input type="password" class="form-control" name="confirmPassword" required minlength="6" />
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">Đăng ký</button>
+        </form>
+
+        <p class="text-center mt-3 text-muted">
+            Đã có tài khoản?
+            <a asp-controller="Account" asp-action="Login">Đăng nhập</a>
+        </p>
+    </div>
+</section>
+
+<script>
+    document.querySelectorAll(".province-item").forEach(item => {
+        item.addEventListener("click", e => {
+            e.preventDefault();
+            const province = e.target.getAttribute("data-value");
+            document.getElementById("provinceDropdown").textContent = "🌆 " + province;
+            document.getElementById("selectedProvince").value = province;
+        });
+    });
+</script>

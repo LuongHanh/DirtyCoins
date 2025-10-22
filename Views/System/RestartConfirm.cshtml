@@ -1,0 +1,32 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Xác nhận khởi động lại hệ thống";
+}
+
+<div class="container mt-5 text-center">
+    <div class="card shadow p-4 mx-auto" style="max-width: 500px;">
+        <h2 class="mb-3 text-warning">⚠️ Xác nhận khởi động lại hệ thống</h2>
+        <p class="text-muted mb-4">
+            Hành động này chỉ dành cho <strong>quản trị viên cấp cao (Admin)</strong>.<br />
+            Vui lòng đăng nhập lại để xác nhận.
+        </p>
+
+        <form method="post" action="/system/do-restart">
+            @Html.AntiForgeryToken()
+            <div class="mb-3 text-start">
+                <label class="form-label">👤 Tên đăng nhập</label>
+                <input type="text" name="Username" class="form-control" required />
+            </div>
+            <div class="mb-3 text-start">
+                <label class="form-label">🔑 Mật khẩu</label>
+                <input type="password" name="Password" class="form-control" required />
+            </div>
+
+            <button type="submit" class="btn btn-danger w-100 mt-2">♻️ Xác nhận khởi động lại</button>
+        </form>
+
+        <div class="mt-4">
+            <a href="/Admin/Dashboard" class="btn btn-outline-secondary">⬅ Quay lại</a>
+        </div>
+    </div>
+</div>

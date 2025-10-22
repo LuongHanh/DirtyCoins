@@ -1,0 +1,109 @@
+﻿@model DirtyCoins.Models.Customer
+@{
+    ViewData["Title"] = "Cập nhật thông tin cá nhân";
+}
+<style>
+    .st-cus {
+        margin: 80px auto 0px;
+        padding-bottom: 40px;
+    }
+</style>
+
+<div class="container dirtycoins-body st-cus">
+    <div class="card border-0 shadow-sm hover-glow p-4 mx-auto" style="max-width:700px; border-radius:20px;">
+        <h3 class="fw-bold mb-3 text-center" style="color:var(--dc-green); font-family:'Bebas Neue',sans-serif;">
+            <i class="bi bi-gear me-2 text-gold"></i> Cập nhật thông tin cá nhân
+        </h3>
+        <p class="text-muted text-center">Giúp DirtyCoins phục vụ bạn tốt hơn ✨</p>
+
+        <form asp-action="Settings" method="post" class="mt-4">
+            <input type="hidden" asp-for="IdCustomer" />
+
+            <div class="mb-3">
+                <label asp-for="FullName" class="form-label fw-semibold text-dark"></label>
+                <input asp-for="FullName" class="form-control shadow-sm" placeholder="Nhập họ tên" />
+                <span asp-validation-for="FullName" class="text-danger small"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Phone" class="form-label fw-semibold text-dark"></label>
+                <input asp-for="Phone" class="form-control shadow-sm" placeholder="Nhập số điện thoại" />
+                <span asp-validation-for="Phone" class="text-danger small"></span>
+            </div>
+
+            <!-- Địa chỉ -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-dark">Tỉnh / Thành phố</label>
+                <div class="dropdown">
+                    <button class="btn btn-outline-dark dropdown-toggle w-100 text-start rounded-pill"
+                            type="button" id="provinceDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        🌆 @(string.IsNullOrEmpty(Model.Address) ? "Chọn tỉnh/thành" : Model.Address)
+                    </button>
+
+                    <ul class="dropdown-menu w-100 shadow-sm" style="max-height: 250px; overflow-y:auto;"
+                        aria-labelledby="provinceDropdown">
+                        @{
+                            var provinces = new[] {
+                                                "Hà Nội", "TP. Hồ Chí Minh", "Hải Phòng", "Đà Nẵng", "Cần Thơ", "An Giang",
+                                                "Bà Rịa - Vũng Tàu", "Bắc Giang", "Bắc Ninh", "Đồng Nai", "Nghệ An", "Thái Nguyên"
+                                                };
+                        }
+                        @foreach (var p in provinces)
+                        {
+                            var active = p == Model.Address ? "active bg-dark text-white" : "";
+                            <li><a class="dropdown-item province-item @active" href="#" data-value="@p">@p</a></li>
+                        }
+                    </ul>
+
+                    <input type="hidden" name="address" id="selectedProvince" value="@Model.Address" required />
+                </div>
+            </div>
+
+            <script>
+                document.querySelectorAll(".province-item").forEach(i => {
+                    i.addEventListener("click", e => {
+                        e.preventDefault();
+                        const val = e.target.getAttribute("data-value");
+                        document.getElementById("provinceDropdown").textContent = "🌆 " + val;
+                        document.getElementById("selectedProvince").value = val;
+                    });
+                });
+            </script>
+
+            <!-- Tọa độ (readonly, nếu có) -->
+            @if (Model.Latitude.HasValue && Model.Longitude.HasValue)
+            {
+                <div class="mb-3 mt-3">
+                    <label class="form-label fw-semibold text-dark">Vị trí hiện tại</label>
+                    <div class="form-control bg-light text-muted small shadow-sm">
+                        📍 @Model.Latitude, @Model.Longitude
+                    </div>
+                </div>
+            }
+
+            <!-- Ngày tạo tài khoản -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold text-dark">Ngày tạo tài khoản</label>
+                <div class="form-control bg-light text-muted small shadow-sm" readonly>
+                    🗓 @Model.CreatedAt.ToString("dd/MM/yyyy")
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mt-4">
+                <button type="submit" class="btn bg-gold fw-semibold rounded-pill px-4 shadow-sm">
+                    💾 Lưu thay đổi
+                </button>
+                <a href="@Url.Action("Dashboard", "Customer")" class="btn btn-outline-dark rounded-pill px-4">
+                    ⬅ Hủy
+                </a>
+            </div>
+        </form>
+
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success mt-4 rounded-pill text-center shadow-sm">
+                @TempData["Success"]
+            </div>
+        }
+    </div>
+</div>

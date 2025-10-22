@@ -1,0 +1,207 @@
+﻿@model IEnumerable<DirtyCoins.Models.Order>
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>Danh sách hóa đơn</title>
+    <style>
+        :root {
+            --dc-dark: #111;
+            --dc-light: #fafafa;
+            --dc-gold: #d4af37;
+        }
+
+        body {
+            font-family: "Inter", "Segoe UI", sans-serif;
+            background: var(--dc-light);
+            margin: 40px auto;
+            max-width: 900px;
+        }
+
+        .bill {
+            background: white;
+            border: 2px solid var(--dc-gold);
+            border-radius: 12px;
+            padding: 30px 40px;
+            margin-bottom: 50px;
+            page-break-after: always;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--dc-gold);
+            padding-bottom: 10px;
+        }
+
+            .header img {
+                height: 60px;
+            }
+
+            .header div {
+                text-align: right;
+            }
+
+        h3 {
+            text-align: center;
+            color: var(--dc-gold);
+            font-weight: bold;
+            margin: 20px 0 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+        }
+
+        th {
+            background: var(--dc-dark);
+            color: var(--dc-gold);
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            text-align: center;
+            color: #666;
+        }
+
+        .sign {
+            width: 45%;
+        }
+
+        .paid {
+            color: green;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .no-print {
+            margin-bottom: 25px;
+        }
+
+            .no-print button {
+                background: var(--dc-dark);
+                color: var(--dc-gold);
+                padding: 8px 14px;
+                border: none;
+                border-radius: 6px;
+                transition: 0.3s;
+            }
+
+                .no-print button:hover {
+                    background: var(--dc-gold);
+                    color: var(--dc-dark);
+                }
+        @@media print {
+            .no-print
+
+        {
+            display: none;
+        }
+
+        .bill {
+            box-shadow: none;
+            border: 1px solid #aaa;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button onclick="window.print()">🖨 In tất cả hóa đơn</button>
+    </div>
+
+    @foreach (var order in Model)
+    {
+        <div class="bill">
+            <div class="header">
+                <img src="/images/aboutUs/favicon.png" alt="Logo" />
+                <div>
+                    <strong>@ViewBag.Store.StoreName</strong><br />
+                    @ViewBag.Store.Address<br />
+                    Hotline: @ViewBag.Store.Phone
+                </div>
+            </div>
+
+            <h3>HÓA ĐƠN BÁN HÀNG</h3>
+            <p><strong>Mã đơn:</strong> #@order.IdOrder</p>
+            <p><strong>Người đặt:</strong> @order.Customer.FullName</p>
+            <p><strong>Người nhận:</strong> @order.Receiver</p>
+            <p><strong>SĐT người nhận:</strong> @order.Phone</p>
+            <p><strong>Địa chỉ giao:</strong> @order.Address</p>
+            <p><strong>Ngày đặt:</strong> @order.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+            <p><strong>Phương thức thanh toán:</strong> @order.PaymentMethod</p>
+            @if (order.Pay)
+            {
+                <p class="paid">✅ ĐÃ THANH TOÁN</p>
+            }
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tên sản phẩm</th>
+                        <th class="center">SL</th>
+                        <th class="right">Đơn giá</th>
+                        <th class="right">Thành tiền</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var d in order.OrderDetails)
+                    {
+                        <tr>
+                            <td>@d.Product.Name</td>
+                            <td class="center">@d.Quantity</td>
+                            <td class="right">@d.UnitPrice.ToString("N0") ₫</td>
+                            <td class="right">@((d.Quantity * d.UnitPrice).ToString("N0")) ₫</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3" class="right">Tổng cộng:</th>
+                        <th class="right">@order.TotalAmount.ToString("N0") ₫</th>
+                    </tr>
+                </tfoot>
+            </table>
+
+            <div class="footer">
+                <div class="sign">
+                    <p><strong>Người gửi hàng</strong></p>
+                    <p>(Ký, ghi rõ họ tên)</p><br /><br /><br />
+                    <p><em>DirtyCoins</em></p>
+                </div>
+                <div class="sign">
+                    <p><strong>Người nhận hàng</strong></p>
+                    <p>(Ký, ghi rõ họ tên)</p><br /><br /><br />
+                    <p><em>@order.Receiver</em></p>
+                </div>
+            </div>
+        </div>
+    }
+</body>
+</html>

@@ -1,0 +1,167 @@
+﻿@model DirtyCoins.Models.Store
+@{
+    ViewData["Title"] = "Bảng điều khiển cửa hàng";
+}
+
+<style>
+    /* ========== DASHBOARD THEME SÁNG HIỆN ĐẠI ========== */
+    .store-dashboard {
+        margin: 80px auto 0px;
+        padding-bottom: 60px;
+        color: var(--dc-text-dark);
+    }
+
+    .dashboard-wrapper {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 2rem;
+        align-items: flex-start;
+    }
+
+    /* ---- Thông tin cửa hàng ---- */
+    .store-info {
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 250, 235, 0.9));
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        border: 1px solid #eee;
+        height: 100%;
+    }
+
+        .store-info h2 {
+            color: var(--dc-yellow);
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .store-info p {
+            margin: 6px 0;
+            font-size: 0.95rem;
+        }
+
+    /* ---- Grid 2x2 bên phải ---- */
+    .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.2rem;
+    }
+
+    .dash-card {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        text-align: center;
+        padding: 1.5rem 1rem;
+        transition: var(--transition);
+        border: 1px solid #eee;
+    }
+
+        .dash-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+        .dash-card h6 {
+            font-size: 0.95rem;
+            color: #666;
+            margin-bottom: 0.4rem;
+        }
+
+        .dash-card h3 {
+            font-size: 1.8rem;
+            color: var(--dc-text-dark);
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+        }
+
+        .dash-card a {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: 1px solid var(--dc-yellow);
+            background: var(--dc-yellow);
+            color: #111;
+            font-weight: 600;
+            transition: var(--transition);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+            .dash-card a:hover {
+                background: #fff;
+                color: var(--dc-yellow);
+                box-shadow: 0 0 10px rgba(255,215,0,0.3);
+            }
+
+    .icon {
+        font-size: 1.8rem;
+        color: var(--dc-yellow);
+        margin-bottom: 0.6rem;
+    }
+
+    @@media (max-width: 992px) {
+        .dashboard-wrapper
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    .store-info {
+        margin-bottom: 1.5rem;
+    }
+
+    }
+</style>
+
+<div class="container store-dashboard">
+    <div class="dashboard-wrapper">
+        <!-- BÊN TRÁI: THÔNG TIN CỬA HÀNG -->
+        <div class="store-info">
+            <h2 class="text-success fw-bold">@Model.StoreName</h2>
+            <p class="text-muted">Bảng điều khiển cửa hàng</p>
+            <hr />
+            <p><strong>🏠 Địa chỉ:</strong> @Model.Address</p>
+            <p><strong>📞 Điện thoại:</strong> @Model.Phone</p>
+            <p><strong>📧 Email:</strong> @Model.Email</p>
+            <p><strong>👤 Chủ cửa hàng:</strong> @Model.StoreOwner</p>
+        </div>
+
+        <!-- BÊN PHẢI: 4 Ô THỐNG KÊ -->
+        <div class="dashboard-grid">
+            <!-- Nhân viên -->
+            <div class="dash-card">
+                <div class="icon">👥</div>
+                <h6>Nhân viên</h6>
+                <h3>@ViewBag.EmployeeCount</h3>
+                <a href="@Url.Action("Employees", "Store")">Xem danh sách</a>
+            </div>
+
+            <!-- Doanh thu -->
+            <div class="dash-card">
+                <div class="icon">💰</div>
+                <h6>Tổng doanh thu</h6>
+                <h3>@string.Format("{0:N0}", (decimal)ViewBag.TotalRevenue) ₫</h3>
+                <a href="@Url.Action("BusinessStatus", "Store")">Xem chi tiết</a>
+            </div>
+
+            <!-- Đơn hàng -->
+            <div class="dash-card">
+                <div class="icon">🛍️</div>
+                <h6>Số đơn hàng</h6>
+                <h3>@ViewBag.TotalOrders</h3>
+                <a href="@Url.Action("SalesStatus", "Store")">Phân tích</a>
+            </div>
+
+            <!-- Báo cáo -->
+            <div class="dash-card">
+                <div class="icon">📄</div>
+                <h6>Báo cáo</h6>
+                <h3>@ViewBag.TotalReports</h3>
+                <a href="@Url.Action("Reports", "Store")">Chi tiết</a>
+            </div>
+        </div>
+    </div>
+</div>

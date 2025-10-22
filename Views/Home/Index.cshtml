@@ -1,0 +1,373 @@
+﻿@{
+    ViewData["Title"] = "DirtyCoins — Born from the street";
+    Layout = "_Layout";
+}
+
+<style>
+    html, body {
+        overflow-x: hidden;
+        scroll-behavior: smooth;
+    }
+
+    section.scene {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        position: relative;
+        text-align: center;
+        transition: background 1s ease;
+        color: #fff;
+    }
+
+    .scene h1, .scene h2 {
+        font-family: 'Bebas Neue', sans-serif;
+        letter-spacing: 2px;
+    }
+
+    /* === HERO VIDEO SCENE === */
+    .scene-hero {
+        position: relative;
+        overflow: hidden;
+        padding-top: -1.5rem;
+    }
+
+    .hero-video {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        filter: brightness(0.7) contrast(1.1) saturate(1.1);
+        z-index: 1;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at center, rgba(0,0,0,), rgba(0,0,0,0.5));
+        z-index: 2;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 3;
+        animation: fadeInUp 1.2s ease-out;
+    }
+
+    .hero-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 6rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        color: #FFD700;
+        text-shadow: 0 0 25px rgba(255,215,0,0.5);
+        animation: glowIn 2s ease forwards;
+    }
+
+    .hero-sub {
+        font-family: 'Poppins', sans-serif;
+        font-size: 1.5rem;
+        color: #eee;
+        margin-top: 0.5rem;
+        text-shadow: 0 0 12px rgba(255,255,255,0.25);
+        animation: fadeInUp 1.6s ease forwards;
+    }
+
+    .cta {
+        margin-top: 2rem;
+        background: linear-gradient(90deg, #FFD700, #fff27a);
+        color: #111;
+        padding: 12px 38px;
+        border-radius: 30px;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+        .cta::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.6), transparent);
+            transition: 0.6s;
+        }
+
+        .cta:hover::before {
+            left: 100%;
+        }
+
+        .cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(255,215,0,0.5);
+        }
+
+    /* === OTHER SCENES === */
+    .scene-lifestyle {
+        background: #fff;
+        color: #111;
+    }
+
+        .scene-lifestyle h2 {
+            color: #006400;
+            font-size: 3rem;
+        }
+
+        .scene-lifestyle .clip {
+            max-width: 700px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+
+    .scene-products {
+        background: linear-gradient(120deg, #000, #111, #1a1a1a);
+        color: #FFD700;
+    }
+
+        .scene-products h2 {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+        }
+
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 1.5rem;
+        width: 90%;
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    .product-card {
+        background: #fff;
+        border-radius: 16px;
+        color: #111;
+        padding: 1rem;
+        transition: 0.3s;
+    }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(255,215,0,0.3);
+        }
+
+    .scene-community {
+        background: radial-gradient(circle, #0d0d0d, #000);
+        color: #fff;
+    }
+
+    .community-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        justify-content: center;
+        margin-top: 2rem;
+    }
+
+        .community-grid img {
+            width: 180px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 16px;
+            transition: transform 0.3s ease, filter 0.3s ease;
+        }
+
+            .community-grid img:hover {
+                transform: scale(1.05);
+                filter: brightness(1.2);
+            }
+
+    /* === ANIMATIONS === */
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    @@keyframes glowIn {
+        0%
+
+    {
+        opacity: 0;
+        text-shadow: none;
+        transform: scale(0.9);
+    }
+
+    50% {
+        opacity: 1;
+        text-shadow: 0 0 20px rgba(255,215,0,0.5);
+        transform: scale(1.05);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    }
+
+    @@media (max-width: 768px) {
+        .hero-title
+
+    {
+        font-size: 3.2rem;
+    }
+
+    .hero-sub {
+        font-size: 1.2rem;
+    }
+
+    }
+
+    /* --- Product Grid Scene --- */
+    .scene-products {
+        padding: 60px 40px;
+        background: radial-gradient(circle at 20% 10%, #fffefb 0%, #fff9ec 40%, #fff4d9 100%);
+        text-align: center;
+    }
+
+        .scene-products h2 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.4rem;
+            letter-spacing: 1px;
+            color: #222;
+            margin-bottom: 40px;
+        }
+
+    /* --- Grid layout --- */
+    .product-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); /* responsive columns */
+        gap: 30px;
+        justify-items: center;
+    }
+
+    /* --- Card --- */
+    .product-card {
+        background: #fff;
+        border-radius: 18px;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+        padding: 16px;
+        width: 100%;
+        max-width: 240px; /* ✅ giới hạn kích thước card */
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        overflow: hidden;
+    }
+
+        .product-card:hover {
+            transform: translateY(-8px) scale(1.03);
+            box-shadow: 0 12px 36px rgba(255, 210, 60, 0.25);
+        }
+
+        /* --- Image --- */
+        .product-card img {
+            width: 100%;
+            height: 200px; /* ✅ giới hạn chiều cao hình */
+            object-fit: cover;
+            border-radius: 14px;
+            margin-bottom: 10px;
+        }
+
+        /* --- Name + Price --- */
+        .product-card h5 {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #222;
+            margin-bottom: 6px;
+        }
+
+        .product-card p {
+            color: #ff9c2f;
+            font-weight: 800;
+            font-size: 1rem;
+            margin-bottom: 12px;
+        }
+
+        /* --- CTA Button --- */
+        .product-card .cta {
+            display: inline-block;
+            background: linear-gradient(90deg,#ffd76a,#ffb84d);
+            color: #111;
+            padding: 8px 18px;
+            border-radius: 999px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.25s ease;
+        }
+
+            .product-card .cta:hover {
+                background: linear-gradient(90deg,#ffdf80,#ffc640);
+                transform: translateY(-2px);
+            }
+</style>
+
+<!-- SCENE 1: HERO VIDEO -->
+<section class="scene scene-hero" id="hero">
+    <video autoplay muted loop playsinline class="hero-video">
+        <source src="/media/street_life.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+    <div class="hero-content text-center">
+        <h1 class="hero-title">Born From The Street</h1>
+        <p class="hero-sub">Built For The Bold.</p>
+        <a href="#scene-lifestyle" class="cta mt-4"><span>Explore ↓</span></a>
+    </div>
+</section>
+
+<!-- SCENE 2: LIFESTYLE -->
+<section class="scene scene-lifestyle" id="scene-lifestyle">
+    <h2 class="mb-3">Urban Energy</h2>
+    <p class="text-muted mb-4">No rules, just vibes.</p>
+    <video autoplay muted loop playsinline class="clip">
+        <source src="/media/street_life.mp4" type="video/mp4" />
+    </video>
+</section>
+
+<!-- SCENE 3: PRODUCT -->
+<section class="scene scene-products" style="height: auto">
+    <h2>Drop Highlights</h2>
+    <div class="product-grid">
+        @if (ViewBag.HotProducts != null)
+        {
+            foreach (var p in ViewBag.HotProducts)
+            {
+                <div class="product-card text-center">
+                    <img src="@p.Image" alt="@p.Name" class="img-fluid rounded mb-2" />
+                    <h5>@p.Name</h5>
+                    <p class="fw-semibold mb-2">@p.Price.ToString("N0") ₫</p>
+                    <a href="@Url.Action("Details", "Product", new { id = p.IdProduct })" class="cta">Xem chi tiết</a>
+                </div>
+            }
+        }
+    </div>
+</section>
+
+<!-- SCENE 4: COMMUNITY -->
+<section class="scene scene-community" style="margin-bottom: -1.5rem;">
+    <h2 class="text-warning mb-4">Join The Movement</h2>
+    <div class="community-grid">
+        <img src="/media/community1.jpg" alt="DirtyCoins community" />
+        <img src="/media/community2.jpg" alt="DirtyCoins style" />
+        <img src="/media/community3.jpg" alt="DirtyCoins streetwear" />
+        <img src="/media/community4.jpg" alt="DirtyCoins vibe" />
+    </div>
+    <a href="/Account/Register" class="cta mt-4">Tham gia ngay</a>
+</section>

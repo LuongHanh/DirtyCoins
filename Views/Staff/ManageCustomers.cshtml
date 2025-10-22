@@ -1,0 +1,65 @@
+﻿@model IEnumerable<DirtyCoins.Models.CustomerRankStat>
+@{
+    ViewData["Title"] = "Quản lý khách hàng";
+    var currentMonth = DateTime.Now.Month;
+    var currentYear = DateTime.Now.Year;
+}
+
+<div class="container dirtycoins-body mt-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <a href="/Staff/Dashboard" class="btn btn-outline-dark rounded-pill">
+            ⬅ Quay lại
+        </a>
+        <h3 class="fw-bold text-center" style="font-family:'Bebas Neue';color:var(--dc-green);">
+            📈 Thống kê khách hàng tháng @currentMonth/@currentYear
+        </h3>
+        <a asp-action="ExportCustomersToExcel" class="btn bg-gold rounded-pill fw-semibold shadow-sm">
+            📊 Xuất Excel
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded-4">
+        <table class="table align-middle text-center">
+            <thead style="background-color:var(--dc-dark);color:white;">
+                <tr>
+                    <th>#</th>
+                    <th>Khách hàng</th>
+                    <th>Địa chỉ</th>
+                    <th>Số ĐT</th>
+                    <th>Số đơn</th>
+                    <th>Tổng chi tiêu</th>
+                    <th>Xếp hạng</th>
+                    <th>Ưu đãi (%)</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int index = 1;
+                }
+                @foreach (var c in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@index</td>
+                        <td>@c.Customer.FullName</td>
+                        <td>@c.Customer.Address</td>
+                        <td>@c.Customer.Phone</td>
+                        <td>@c.OrderCount</td>
+                        <td class="text-end">@c.TotalSpent.ToString("N0") ₫</td>
+                        <td>
+                            <span class="badge @(c.RankName switch
+                                  {
+                                      "Đồng" => "bg-secondary",
+                                      "Bạc" => "bg-info text-dark",
+                                      "Vàng" => "bg-warning text-dark",
+                                      "Kim cương" => "bg-success",
+                                      _ => "bg-light"
+                                  })">@c.RankName</span>
+                    </td>
+                    <td>@c.DiscountPercent%</td>
+                </tr>
+                                index++;
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

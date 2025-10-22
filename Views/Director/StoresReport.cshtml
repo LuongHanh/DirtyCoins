@@ -1,0 +1,191 @@
+﻿@model IEnumerable<dynamic>
+@{
+    ViewData["Title"] = "📍 Báo cáo theo chi nhánh";
+    var storesList = Model.ToList();
+}
+<style>
+    .str-dir {
+        padding: 0px 75px;
+    }
+</style>
+<div class="container-fluid dirtycoins-body str-dir">
+
+    <a href="/Director/Dashboard" class="btn btn-outline-gold mb-4 rounded-pill px-3 fw-semibold">
+        ← Quay lại trang tổng quan
+    </a>
+
+    <h2 class="text-center mb-5 fw-bold text-gradient">
+        📊 Báo cáo chi tiết theo chi nhánh
+    </h2>
+
+    <!-- ===== DANH MỤC CHI NHÁNH ===== -->
+    <div class="card bg-light border-0 shadow-sm mb-5">
+        <div class="card-header bg-gold-gradient py-3 rounded-top-3">
+            <h5 class="mb-0 fw-semibold text-dark">📑 Danh mục chi nhánh</h5>
+        </div>
+        <div class="card-body text-center">
+            <div class="d-flex flex-wrap gap-2 justify-content-center">
+                @foreach (var storeData in storesList)
+                {
+                    var store = storeData.Store;
+                    <a href="#store-@store.IdStore"
+                       class="btn border-2 border-warning btn-sm rounded-pill px-3 hover-glow">
+                        🏪 @store.StoreName
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== DANH SÁCH CHI NHÁNH ===== -->
+    @foreach (var storeData in storesList)
+    {
+        var store = storeData.Store;
+        var employees = storeData.Employees as IEnumerable<DirtyCoins.Models.Employee>;
+        var reports = storeData.Reports as IEnumerable<DirtyCoins.Models.Report>;
+        var inventories = storeData.Inventories as IEnumerable<DirtyCoins.Models.MonthlyInventory>;
+
+        <div id="store-@store.IdStore" class="card border-0 shadow-lg mb-5">
+            <!-- Header -->
+            <div class="card-header bg-green-gradient py-4">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <div>
+                        <h4 class="fw-bold mb-1 text-gold">🏪 @store.StoreName</h4>
+                        <small class="text-light">@store.Address</small>
+                    </div>
+                    <span class="badge bg-gold px-3 py-2 rounded-pill">ID: @store.IdStore</span>
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="card-body" style="background: var(--dc-bg-soft);">
+
+                <!-- Tổng quan -->
+                <div class="row text-center mb-4 g-3">
+                    <div class="col-md-3">
+                        <div class="p-3 rounded-3 bg-white shadow-sm border-start border-3 border-dark">
+                            <p class="text-muted mb-1">📍 Địa chỉ</p>
+                            <h6 class="fw-semibold">@store.Address</h6>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded-3 bg-white shadow-sm border-start border-3 border-success">
+                            <p class="text-muted mb-1">📞 SĐT</p>
+                            <h6 class="fw-semibold">@store.Phone</h6>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded-3 bg-white shadow-sm border-start border-3 border-warning">
+                            <p class="text-muted mb-1">👤 Quản lý</p>
+                            <h6 class="fw-semibold">@store.StoreOwner</h6>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="p-3 rounded-3 bg-white shadow-sm border-start border-3 border-primary">
+                            <p class="text-muted mb-1">👥 Nhân viên</p>
+                            <h6 class="fw-semibold">@employees.Count()</h6>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Nhân viên -->
+                <div class="mb-5">
+                    <h5 class="fw-bold mb-3 text-dark">👥 Danh sách nhân viên</h5>
+                    <div class="table-responsive shadow-sm rounded-3">
+                        <table class="table align-middle table-hover mb-0">
+                            <thead class="text-dark">
+                                <tr>
+                                    <th>Họ tên</th>
+                                    <th>Chức vụ</th>
+                                    <th>Ngày vào</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var emp in employees)
+                                {
+                                    <tr>
+                                        <td class="fw-medium">@emp.FullName</td>
+                                        <td>@emp.Position</td>
+                                        <td>@emp.HiredDate.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tồn kho -->
+                <div class="mb-5">
+                    <h5 class="fw-bold mb-3 text-dark">📦 Tồn kho tháng @DateTime.Now.Month/@DateTime.Now.Year</h5>
+                    <div class="table-responsive shadow-sm rounded-3">
+                        <table class="table table-bordered align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="text-center">
+                                    <th>Sản phẩm</th>
+                                    <th>Đầu kỳ</th>
+                                    <th>Nhập</th>
+                                    <th>Bán</th>
+                                    <th>Cuối kỳ</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var inv in inventories)
+                                {
+                                    <tr class="text-center">
+                                        <td class="text-start">@inv.Product?.Name</td>
+                                        <td>@inv.BeginQty</td>
+                                        <td>@inv.ImportedQty</td>
+                                        <td>@inv.SoldQty</td>
+                                        <td>@inv.EndQty</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Doanh thu -->
+                <div>
+                    <h5 class="fw-bold mb-3 text-dark">💰 Doanh thu 6 tháng gần nhất</h5>
+                    <div class="table-responsive shadow-sm rounded-3">
+                        <table class="table align-middle table-hover mb-0">
+                            <thead class="">
+                                <tr class="text-dark text-center">
+                                    <th>Tháng</th>
+                                    <th>Doanh thu (₫)</th>
+                                    <th>Đơn hàng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var r in reports.OrderBy(r => r.Date))
+                                {
+                                    <tr class="text-center">
+                                        <td>@r.Date.ToString("MM/yyyy")</td>
+                                        <td class="fw-bold text-success">@String.Format("{0:N0}", r.TotalRevenue)</td>
+                                        <td>@r.TotalOrders</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    .text-gradient {
+        background: linear-gradient(90deg, #0D0D0D, #333333, #FFD700);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .card {
+        background: linear-gradient(145deg, #fff, #fbfbfb);
+    }
+
+    .card:hover {
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+    }
+</style>

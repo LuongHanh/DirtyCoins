@@ -1,0 +1,120 @@
+﻿@model IEnumerable<DirtyCoins.ViewModels.FeedbackViewModel>
+
+@if (Model != null && Model.Any())
+{
+    <div class="feedback-list">
+        @foreach (var fb in Model)
+        {
+            <div class="border rounded-4 p-3 mb-3 bg-light">
+                <div class="d-flex justify-content-between align-items-center mb-1">
+                    <h6 class="mb-0 fw-bold">@fb.UserName</h6>
+                </div>
+
+                <div class="text-warning fs-5 mb-1">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        if (i <= fb.Rating)
+                        {
+                            <i class="bi bi-star-fill"></i>
+                        }
+                        else
+                        {
+                            <i class="bi bi-star"></i>
+                        }
+                    }
+                </div>
+
+                <p class="mb-2">@fb.Content</p>
+
+                <button class="btn btn-sm btn-outline-secondary btn-like" data-id="@fb.IdFeedback">
+                    <i class="bi bi-hand-thumbs-up"></i> Thích (@fb.LikeCount)
+                </button>
+
+                @if (fb.Replies != null && fb.Replies.Any())
+                {
+                    <div class="mt-2 ps-3 border-start border-3 border-warning-subtle">
+                        @foreach (var r in fb.Replies)
+                        {
+                            <div class="bg-white rounded p-2 mb-2">
+                                <small class="text-muted fw-semibold">
+                                    @if (r.IsStaff)
+                                    {
+                                        <span class="text-warning">Nhân viên DirtyCoins</span>
+                                    }
+                                    else
+                                    {
+                                        <span>@r.UserName</span>
+                                    }
+                                    · @r.ReplyDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")
+                                </small>
+                                <p class="mb-0 text-dark">@r.ReplyContent</p>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p class="text-muted fst-italic">Chưa có đánh giá nào cho sản phẩm này.</p>
+}
+
+@section Scripts {
+    <script>
+        // GỬI PHẢN HỒI
+        $(document).on('click', '.btn-reply', function () {
+            const idFeedback = $(this).data('id');
+            const replyContent = $(this).closest('.reply-form').find('.reply-content').val();
+
+            if (!replyContent.trim()) {
+                alert("Vui lòng nhập nội dung phản hồi.");
+                return;
+            }
+
+            $.ajax({
+                url: '/Feedback/AddReply',
+                type: 'POST',
+                data: {
+                    idFeedback: idFeedback,
+                    content: replyContent,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (res) {
+                    if (res.success) {
+                        location.reload();
+                    } else {
+                        alert(res.message || "Gửi phản hồi thất bại.");
+                    }
+                },
+                error: function () {
+                    alert("Lỗi máy chủ, thử lại sau.");
+                }
+            });
+        });
+
+        // LIKE FEEDBACK
+        $(document).on('click', '.btn-like', function () {
+            const idFeedback = $(this).data('id');
+            $.ajax({
+                url: '/Feedback/LikeFeedback',
+                type: 'POST',
+                data: {
+                    idFeedback: idFeedback,
+                    __RequestVerificationToken: $('input[name="__RequestVerificationToken"]').val()
+                },
+                success: function (res) {
+                    if (res.success) {
+                        location.reload();
+                    } else {
+                        alert(res.message);
+                    }
+                },
+                error: function () {
+                    alert("Lỗi khi gửi like.");
+                }
+            });
+        });
+    </script>
+}

@@ -1,0 +1,359 @@
+﻿@model List<DirtyCoins.ViewModels.CartItemViewModel>
+
+@{
+    ViewData["Title"] = "Thanh toán";
+    Layout = "_Layout";
+    decimal total = ViewBag.Total ?? 0;
+    decimal discountTotal = ViewBag.TotalDiscount ?? 0;
+    string orderCode = ViewBag.OrderCode ?? "";
+}
+
+<style>
+    /* ---------- CHECKOUT PAGE (DirtyCoins Style) ---------- */
+    .checkout-page {
+        background: radial-gradient(circle at 20% 10%, #fffefb 0%, #fff9ec 30%, #fff4d9 70%, #f3efe7 100%);
+        min-height: 90vh;
+        padding: 2rem 0 4rem;
+    }
+
+    .checkout-form, .order-summary {
+        background: #fff;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+        padding: 2rem;
+    }
+
+        .checkout-form label {
+            font-weight: 600;
+        }
+
+        .checkout-form input, .checkout-form textarea, .checkout-form select {
+            border-radius: 10px;
+        }
+
+        .order-summary h5 {
+            color: var(--dc-yellow);
+            font-weight: 700;
+            font-size: 1.2rem;
+        }
+
+        .order-summary .card {
+            border: none;
+            background: transparent;
+        }
+
+    .btn-success {
+        background: var(--dc-green);
+        border: none;
+        border-radius: 25px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+        transition: var(--transition);
+    }
+
+        .btn-success:hover {
+            background: #0b5;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+    #paymentModal .modal-content {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    }
+    /* ---------- POPUP STYLE UPGRADE ---------- */
+    .popup-content {
+        animation: fadeInUp 0.35s ease;
+        text-align: center;
+        color: #333;
+    }
+
+        .popup-content.success .popup-icon {
+            font-size: 3rem;
+            color: #28a745;
+            animation: popIn 0.3s ease;
+        }
+
+    .popup-icon {
+        font-size: 2.8rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Custom Button Gold */
+    .btn-gold {
+        background: linear-gradient(135deg, #c99700, #f5d142);
+        color: #fff;
+        border: none;
+        border-radius: 25px;
+        padding: 0.6rem 1.5rem;
+        font-weight: 600;
+        transition: all 0.2s ease;
+    }
+
+        .btn-gold:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(249, 198, 46, 0.4);
+        }
+
+    /* Animations */
+    @@keyframes fadeInUp {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    @@keyframes popIn {
+        0%
+
+    {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    }
+    /* ---------- POPUP QR STYLE ---------- */
+    .qr-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .img-qr {
+        width: 320px;
+        height: auto;
+        border-radius: 12px;
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .img-qr:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+        }
+
+</style>
+
+<div class="checkout-page">
+    <div class="container mt-5">
+    <h2 class="mb-4">💳 Thanh toán đơn hàng</h2>
+
+    <div class="row">
+        <!-- Form thanh toán -->
+        <div class="col-md-8">
+            <form id="checkoutForm">
+                <div class="mb-3">
+                    <label class="form-label">Họ tên người nhận</label>
+                    <input type="text" name="FullName" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Số điện thoại</label>
+                    <input type="text" name="Phone" class="form-control" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Địa chỉ giao hàng</label>
+                    <textarea name="Address" class="form-control" rows="3" required></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Phương thức thanh toán</label>
+                    <select class="form-select" name="PaymentMethod" id="paymentMethod" required>
+                        <option value="">-- Chọn phương thức --</option>
+                        <option value="COD">Thanh toán khi nhận hàng (COD)</option>
+                        <option value="Bank">Chuyển khoản ngân hàng</option>
+                        <option value="EWallet">Ví điện tử</option>
+                    </select>
+                </div>
+
+                <div id="paymentInfo" class="mb-3" style="display:none;">
+                    <div id="bankInfo" style="display:none;"></div>
+                    <div id="eWalletInfo" style="display:none;"></div>
+                </div>
+
+                <div class="text-end">
+                    <a href="@Url.Action("Index", "Cart")" class="btn btn-outline-secondary">← Quay lại giỏ hàng</a>
+                    <button type="submit" class="btn btn-success">Xác nhận thanh toán</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Tóm tắt đơn hàng -->
+        <div class="col-md-4">
+            <div class="card shadow-sm p-3">
+                <h5 class="border-bottom pb-2 mb-3">🧾 Tóm tắt đơn hàng</h5>
+
+                <p><strong>Mã đơn hàng:</strong> <span id="summaryOrderCode">@orderCode</span></p>
+                <p><strong>Số lượng sản phẩm:</strong> @(ViewBag.ItemCount ?? 0)</p>
+
+                <div class="border-top border-bottom py-2 mb-3">
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach (var item in Model)
+                        {
+                            var hasDiscount = item.DiscountPercent > 0;
+                            <div class="d-flex justify-content-between small mb-2">
+                                <span>@item.Product.Name (@($"x{item.Quantity}"))</span>
+                                @if (hasDiscount)
+                                {
+                                    <span class="text-danger">
+                                        @( (item.DiscountedPrice * item.Quantity).ToString("N0") ) ₫
+                                        <span class="text-success small">(-@item.DiscountPercent%)</span>
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span>@item.Product.Price.ToString("N0") ₫</span>
+                                }
+                                @if (ViewBag.MemberDiscount != null && ViewBag.MemberDiscount > 0)
+                                {
+                                    <p class="text-success">
+                                        Ưu đãi thành viên: <strong>-@ViewBag.MemberDiscount %</strong>
+                                    </p>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+
+                @if (discountTotal > 0)
+                {
+                    <p class="text-success">
+                        Giảm giá đã áp dụng: <strong>-@discountTotal.ToString("N0") ₫</strong>
+                    </p>
+                }
+
+                <p class="fw-bold text-danger fs-5">
+                    Tổng thanh toán: @total.ToString("N0") ₫
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+<!-- Popup Modal -->
+<div class="modal fade" id="paymentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="margin-top: 90px;">
+        <div class="modal-content">
+            <div class="modal-body" id="modalBody" style="text-align:center; padding:8px;">
+                <!-- Nội dung popup sẽ được inject bằng JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Submit form thanh toán
+            $('#checkoutForm').submit(function (e) {
+                e.preventDefault();
+
+                if (!this.checkValidity()) {
+                    this.reportValidity();
+                    return;
+                }
+
+                var formData = $(this).serialize();
+                var method = $('#paymentMethod').val();
+
+                // Hiện popup loading
+                $('#modalBody').html('<div class="spinner-border text-primary" role="status"></div>');
+                $('#paymentModal').modal({ backdrop: 'static', keyboard: false }).modal('show');
+
+                $.post("@Url.Action("CheckoutAjax", "Cart")", formData, function (res) {
+                    if (!res.success) {
+                        $('#modalBody').html(`
+                            <h5>❌ ${res.message}</h5>
+                            <button class="btn btn-primary mt-3" onclick="window.location.href='@Url.Action("Login", "Account")'">Đăng nhập</button>
+                        `);
+                        return;
+                    }
+
+                    var total = parseInt(res.totalAmount).toLocaleString();
+                    var orderCode = res.orderCode;
+                    $('#summaryOrderCode').text(orderCode);
+
+                    var html = '';
+
+                    if (method === 'COD') {
+                        html = `
+                            <div class="popup-content success">
+                                <div class="popup-icon">✅</div>
+                                <h5>Đặt hàng thành công!</h5>
+                                <p>Mã đơn hàng: <strong>${orderCode}</strong></p>
+                                <p>Tổng thanh toán: <strong>${total} ₫</strong></p>
+                                <p class="text-muted">Thanh toán khi nhận hàng</p>
+                                <button class="btn btn-gold mt-3" onclick="window.location.href='@Url.Action("Index", "Product")'">Tiếp tục mua sắm</button>
+                            </div>`;
+                    }
+                    else if (method === 'EWallet') {
+                        html = `
+                            <div class="popup-content">
+                                <h5 class="mb-3">Ví điện tử MOMO</h5>
+                                <div class="qr-container">
+                                    <img src="/images/pay/MOMO.jpg" class="img-qr mb-2" alt="MOMO QR" />
+                                    <p class="text-muted small">Quét mã để thanh toán MOMO</p>
+                                </div>
+                                <p>Mã đơn hàng: <strong>${orderCode}</strong></p>
+                                <p>Số tiền: <strong>${total} ₫</strong></p>
+                                <div class="spinner-border text-warning mt-3" role="status"></div>
+                            </div>`;
+                        setTimeout(() => {
+                            $('#modalBody').html(`
+                                <div class="popup-content success">
+                                    <div class="popup-icon">🎉</div>
+                                    <h5>Thanh toán thành công!</h5>
+                                    <p>Mã đơn hàng: <strong>${orderCode}</strong></p>
+                                    <p>Số tiền: <strong>${total} ₫</strong></p>
+                                    <button class="btn btn-gold mt-3" onclick="window.location.href='@Url.Action("Index", "Product")'">Tiếp tục mua sắm</button>
+                                </div>`);
+                        }, 5000);
+                    }
+                    else if (method === 'Bank') {
+                        html = `
+                            <div class="popup-content">
+                                <h5 class="mb-3">Chuyển khoản ngân hàng</h5>
+                                <div class="qr-container">
+                                    <img src="/images/pay/AGRIBANK.jpg" class="img-qr mb-2" alt="Agribank QR" />
+                                    <p class="text-muted small">Quét mã hoặc chuyển khoản trực tiếp</p>
+                                </div>
+                                <p>Mã đơn hàng: <strong>${orderCode}</strong></p>
+                                <p>Số tiền: <strong>${total} ₫</strong></p>
+                                <div class="spinner-border text-warning mt-3" role="status"></div>
+                            </div>`;
+                        setTimeout(() => {
+                            $('#modalBody').html(`
+                                <div class="popup-content success">
+                                    <div class="popup-icon">💰</div>
+                                    <h5>Thanh toán thành công!</h5>
+                                    <p>Mã đơn hàng: <strong>${orderCode}</strong></p>
+                                    <p>Số tiền: <strong>${total} ₫</strong></p>
+                                    <button class="btn btn-gold mt-3" onclick="window.location.href='@Url.Action("Index", "Product")'">Tiếp tục mua sắm</button>
+                                </div>`);
+                        }, 5000);
+                    }
+
+                    $('#modalBody').html(html);
+                });
+            });
+
+        });
+    </script>
+}

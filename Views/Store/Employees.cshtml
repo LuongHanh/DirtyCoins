@@ -1,0 +1,60 @@
+﻿@model IEnumerable<DirtyCoins.Models.Employee>
+@{
+    ViewData["Title"] = "Nhân viên cửa hàng";
+}
+<style>
+    .e-st {
+        margin: 80px auto 0px;
+        padding-bottom: 40px;
+    }
+</style>
+<div class="container e-st">
+    <a href="/Store/Dashboard" class="mb-2 d-inline-block text-dark">⬅ Quay lại</a>
+    <div class="mb-5">
+        <h2 class="fw-bold text-success" style="color: var(--dc-yellow); font-family: 'Bebas Neue', sans-serif;">
+            👥 Danh sách nhân viên
+        </h2>
+        <p class="text-muted">Quản lý nhân sự và thông tin nhân viên của cửa hàng</p>
+    </div>
+
+    @if (Model.Any())
+    {
+        <div class="card shadow-lg border-0 p-4"
+             style="background: var(--dc-bg-soft); border-radius: 16px;">
+            <table class="table table-hover align-middle text-center mb-0">
+                <thead style="background: var(--dc-dark); color: var(--dc-yellow);">
+                    <tr>
+                        <th>Mã NV</th>
+                        <th>Họ tên</th>
+                        <th>Chức vụ</th>
+                        <th>Ngày vào làm</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var e in Model)
+                    {
+                        <tr style="transition: var(--transition);">
+                            <td class="fw-semibold">@e.IdEmployee</td>
+                            <td>@e.FullName</td>
+                            <td>
+                                <span class="badge bg-gold text-dark px-3 py-2 rounded-pill">
+                                    @e.Position
+                                </span>
+                            </td>
+                            <td>@e.HiredDate.ToString("dd/MM/yyyy")</td>
+                            <td>@e.User?.Email</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5">
+            <p class="text-muted fs-5">Chưa có nhân viên nào được thêm 💼</p>
+            <a href="/Store/Dashboard" class="btn bg-gold mt-3 fw-semibold">⬅ Quay lại Dashboard</a>
+        </div>
+    }
+</div>

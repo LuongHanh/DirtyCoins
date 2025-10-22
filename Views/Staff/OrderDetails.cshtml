@@ -1,0 +1,241 @@
+﻿@model DirtyCoins.Models.Order
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <title>Hóa đơn #@Model.IdOrder</title>
+    <style>
+        /* ======= THEME: Đen – Xám – Vàng ======= */
+        :root {
+            --dc-dark: #111;
+            --dc-light: #fafafa;
+            --dc-gold: #d4af37;
+            --dc-gray: #666;
+        }
+
+        body {
+            font-family: "Inter", "Segoe UI", sans-serif;
+            background: var(--dc-light);
+            color: #222;
+            margin: 40px auto;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .bill {
+            background: white;
+            border: 2px solid var(--dc-gold);
+            border-radius: 12px;
+            padding: 30px 40px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--dc-gold);
+            padding-bottom: 10px;
+        }
+
+            .header img {
+                height: 60px;
+            }
+
+            .header div {
+                text-align: right;
+            }
+
+        h3 {
+            text-align: center;
+            color: var(--dc-gold);
+            letter-spacing: 1px;
+            font-weight: 700;
+            margin: 25px 0 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+        }
+
+        th {
+            background: var(--dc-dark);
+            color: var(--dc-gold);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .info p {
+            margin: 3px 0;
+        }
+
+        .paid {
+            font-weight: bold;
+            color: green;
+            margin-top: 5px;
+        }
+
+        .unpaid {
+            font-weight: bold;
+            color: red;
+            margin-top: 5px;
+        }
+
+        .footer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+        }
+
+        .sign {
+            width: 45%;
+            color: var(--dc-gray);
+        }
+
+            .sign p {
+                margin: 6px 0;
+            }
+
+        .no-print {
+            margin-bottom: 20px;
+        }
+
+            .no-print button, .no-print a {
+                background: var(--dc-dark);
+                color: var(--dc-gold);
+                padding: 8px 14px;
+                border: none;
+                border-radius: 6px;
+                text-decoration: none;
+                transition: 0.3s;
+            }
+
+                .no-print button:hover, .no-print a:hover {
+                    background: var(--dc-gold);
+                    color: var(--dc-dark);
+                }
+
+        @@media print {
+            body
+
+        {
+            background: white;
+            margin: 0;
+            padding: 0;
+        }
+
+        .no-print {
+            display: none;
+        }
+
+        .bill {
+            box-shadow: none;
+            border: 1px solid #aaa;
+            page-break-after: always;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <button onclick="window.print()">🖨 In hóa đơn</button>
+        <a href="/Staff/ManageOrders" style="margin-left:10px;">⬅ Quay lại</a>
+    </div>
+
+    <div class="bill">
+        <div class="header">
+            <img src="/images/aboutUs/favicon.png" alt="Logo" />
+            <div>
+                <strong>@ViewBag.Store.StoreName</strong><br />
+                @ViewBag.Store.Address<br />
+                Hotline: @ViewBag.Store.Phone
+            </div>
+        </div>
+
+        <h3>HÓA ĐƠN BÁN HÀNG</h3>
+
+        <div class="info">
+            <p><strong>Mã đơn:</strong> #@Model.IdOrder</p>
+            <p><strong>Người đặt:</strong> @Model.Customer.FullName</p>
+            <p><strong>Người nhận:</strong> @Model.Receiver</p>
+            <p><strong>SĐT người nhận:</strong> @Model.Phone</p>
+            <p><strong>Địa chỉ giao:</strong> @Model.Address</p>
+            <p><strong>Ngày đặt:</strong> @Model.OrderDate.ToString("dd/MM/yyyy HH:mm")</p>
+            <p><strong>Phương thức thanh toán:</strong> @Model.PaymentMethod</p>
+            @if (Model.Pay)
+            {
+                <p class="paid">✅ ĐÃ THANH TOÁN</p>
+            }
+            else
+            {
+                <p class="unpaid">⚠ CHƯA THANH TOÁN</p>
+            }
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Tên sản phẩm</th>
+                    <th class="center">SL</th>
+                    <th class="right">Đơn giá</th>
+                    <th class="right">Thành tiền</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var d in Model.OrderDetails)
+                {
+                    <tr>
+                        <td>@d.Product.Name</td>
+                        <td class="center">@d.Quantity</td>
+                        <td class="right">@d.UnitPrice.ToString("N0") ₫</td>
+                        <td class="right">@((d.Quantity * d.UnitPrice).ToString("N0")) ₫</td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th colspan="3" class="right">Tổng cộng:</th>
+                    <th class="right">@Model.TotalAmount.ToString("N0") ₫</th>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="footer">
+            <div class="sign">
+                <p><strong>Người gửi hàng</strong></p>
+                <p>(Ký, ghi rõ họ tên)</p><br /><br /><br />
+                <p><em>DirtyCoins</em></p>
+            </div>
+            <div class="sign">
+                <p><strong>Người nhận hàng</strong></p>
+                <p>(Ký, ghi rõ họ tên)</p><br /><br /><br />
+                <p><em>@Model.Receiver</em></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

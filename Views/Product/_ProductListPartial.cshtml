@@ -1,0 +1,192 @@
+﻿@model List<DirtyCoins.ViewModels.ProductViewModel>
+
+<style>
+    /* Neon chaos product card — matches daylight layout */
+    .chaos-card {
+        width: 100%;
+        max-width: 200px;
+        border-radius: 20px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.92), rgba(255,250,240,0.8));
+        border: 1px solid rgba(220,180,50,0.12);
+        box-shadow: 0 22px 60px rgba(0,0,0,0.06);
+        overflow: hidden;
+        transform-style: preserve-3d;
+        transition: transform 0.35s cubic-bezier(.2,1,.2,1), box-shadow 0.35s;
+        position: relative;
+        cursor: grab;
+        opacity: 0;
+        will-change: transform, opacity;
+    }
+
+        .chaos-card.show {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .chaos-card:hover {
+            transform: rotateY(10deg) rotateX(4deg) scale(1.05);
+            box-shadow: 0 25px 80px rgba(255, 220, 0, 0.4);
+        }
+
+        .chaos-card img {
+            width: 100%;
+            height: 70%;
+            object-fit: cover;
+            border-top-left-radius: 22px;
+            border-top-right-radius: 22px;
+            transition: transform 0.9s ease;
+            overflow: hidden;
+        }
+
+        .chaos-card:hover img {
+            transform: scale(1.12);
+        }
+
+        .chaos-card .media {
+            height: 70%;
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
+            background: #eee;
+        }
+
+    .chaos-info {
+        height: 30%;
+        background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,245,200,0.9));
+        padding: 16px;
+        display: flex;
+        flex-direction: column;
+        justify-content: right;
+        border-bottom-left-radius: 22px;
+        border-bottom-right-radius: 22px;
+    }
+
+        .chaos-info h5 {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.4rem;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .chaos-info .price {
+            color: #ffb300;
+            font-weight: 800;
+            font-size: 1.1rem;
+        }
+
+        .chaos-info small {
+            color: #888;
+        }
+
+    .chaos-actions {
+        display: flex;
+        justify-content: right;
+        margin-top: 6px;
+    }
+
+    .chaos-btn {
+        border-radius: 999px;
+        border: 1px solid rgba(255, 210, 0, 0.4);
+        background: rgba(255, 255, 255, 0.7);
+        font-weight: 600;
+        padding: 7px 14px;
+        cursor: pointer;
+        transition: all 0.25s;
+    }
+     
+        .chaos-btn.buy {
+            background: linear-gradient(90deg,#ffd76a,#ffb84d);
+            color: #111;
+        }
+
+        .chaos-btn.view {
+            background: rgba(0,0,0,0.04);
+            color: var(--dc-dark);
+            border: 1px solid rgba(0,0,0,0.03);
+        }
+
+    .ribbon-new {
+        position: absolute;
+        top: 12px;
+        left: -18px;
+        transform: rotate(-20deg);
+        background: linear-gradient(90deg, #fff176, #ffe082);
+        padding: 4px 18px;
+        border-radius: 6px;
+        font-weight: 700;
+        box-shadow: 0 0 15px rgba(255, 220, 0, 0.3);
+    }
+
+    .chaos-card.entering {
+        animation: cardDrop 0.9s ease both;
+    }
+
+    @@keyframes cardDrop {
+        0% {
+            opacity: 0;
+            transform: translateY(-80px) rotateX(20deg) scale(0.9);
+        }
+
+        80% {
+            transform: translateY(10px) rotateX(-5deg) scale(1.02);
+        }
+
+        100% {
+            opacity: 1;
+            transform: rotateX(0deg) scale(1);
+        }
+    }
+</style>
+
+<div class="deck">
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center text-muted fs-5 py-5">Không tìm thấy sản phẩm phù hợp 😢</div>
+    }
+    else
+    {
+        var rnd = new Random();
+        foreach (var p in Model)
+        {
+            var rot = rnd.Next(-10, 10);
+            <div class="chaos-card entering show" style="--rot: @@rotdeg;">
+                <div class="ribbon-new">@((p.DiscountPercent > 0) ? $"-{p.DiscountPercent}%" : "NEW")</div>
+                <div class="media">
+                    <img loading="lazy" src="@((p?.Image) ?? "/images/placeholder.png")" alt="@p.Name" />
+                </div>
+                <div class="chaos-info">
+                    <div>
+                        <h5>@p.Name</h5>
+                        @if (p.DiscountPercent > 0)
+                        {
+                            <div style="display: flex; align-items: center; justify-content: space-between;">
+                                <div class="price">@p.DiscountedPrice.ToString("N0") ₫</div>
+                                <small class="text-decoration-line-through">@p.Price.ToString("N0") ₫</small>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="price">@p.Price.ToString("N0") ₫</div>
+                        }
+                    </div>
+
+                    <div class="chaos-actions">
+                        <a asp-action="Details" asp-route-id="@p.IdProduct" class="btn btn-outline-dark me-1 chaos-btn view">Xem</a>
+                        <form method="post" asp-controller="Cart" asp-action="CheckoutSingle" class="d-inline quick-buy-form">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="IdProduct" value="@p.IdProduct" />
+                            <input type="hidden" name="quantity" value="1" />
+                            <button type="submit" class="btn btn-primary chaos-btn buy">Mua</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<script>
+    // thêm animation khi load lại
+    document.querySelectorAll('.chaos-card').forEach((c, i) => {
+        c.style.animationDelay = (i * 0.05) + 's';
+    });
+</script>

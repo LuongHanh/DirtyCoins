@@ -1,0 +1,10 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Hệ thống đang bảo trì";
+}
+<div class="d-flex flex-column align-items-center justify-content-center vh-100 bg-light text-center">
+    <h1 class="display-5 text-warning mb-3">🛠️ Hệ thống đang bảo trì</h1>
+    <p class="lead">Từ <strong>@ViewBag.Start</strong> đến <strong>@ViewBag.End</strong></p>
+    <p class="text-muted">📝 @ViewBag.Reason</p>
+    <p class="mt-4 text-secondary">Vui lòng quay lại sau khi hệ thống hoàn tất bảo trì.</p>
+</div>

@@ -1,0 +1,423 @@
+﻿@{
+    Layout = null;
+    var store = ViewBag.Store;
+    var business = ViewBag.BusinessReport;
+    var sales = ViewBag.SalesReport as IEnumerable<dynamic>;
+    var now = DateTime.Now;
+    var prevMonth = now.AddMonths(-1);
+
+    string city = "";
+    if (!string.IsNullOrWhiteSpace(store?.StoreName))
+    {
+        var parts = store.StoreName.Split('-');
+        if (parts.Length > 0)
+        {
+            city = parts[parts.Length - 1].Trim(); // "HÀ NỘI"
+        }
+    }
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Báo cáo tình trạng kinh doanh tháng @now.Month/@now.Year</title>
+    <style>
+        body {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
+            margin: 20px;
+            color: #000;
+        }
+
+        .report {
+            border: 1px solid #333;
+            padding: 30px 45px;
+            background: #fff;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+            .header strong {
+                font-size: 14px;
+            }
+
+        h3, h5 {
+            text-align: center;
+            margin: 5px 0;
+        }
+
+        h5 {
+            font-weight: normal;
+        }
+
+        hr {
+            border: 0;
+            border-top: 1px solid #555;
+            margin: 10px 0 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        th, td {
+            border: 1px solid #555;
+            padding: 6px 8px;
+        }
+
+        th {
+            background-color: #eee;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .right {
+            text-align: right;
+        }
+
+        .section {
+            margin-top: 25px;
+        }
+
+        .section-title {
+            font-weight: bold;
+            font-size: 15px;
+            margin-top: 25px;
+            text-transform: uppercase;
+        }
+
+        .footer {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .sign {
+            width: 45%;
+            text-align: center;
+        }
+
+            .sign p {
+                margin: 5px 0;
+            }
+
+        /* ---------- NÚT & THANH TRÊN CÙNG (đã làm đẹp) ---------- */
+        .no-print {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+            .no-print a,
+            .no-print button {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 8px 14px;
+                border: none;
+                border-radius: 8px;
+                font-family: 'Poppins', sans-serif;
+                font-weight: 600;
+                cursor: pointer;
+                text-decoration: none;
+                transition: all 0.25s ease;
+                font-size: 14px;
+            }
+
+        .btn-back {
+            background: #111;
+            color: #fff;
+        }
+
+            .btn-back:hover {
+                background: #333;
+                color: #FFD700;
+            }
+
+        .btn-print {
+            background: #FFD700;
+            color: #111;
+        }
+
+            .btn-print:hover {
+                background: #fce76d;
+                transform: translateY(-1px);
+            }
+
+        .btn-excel {
+            background: #006400;
+            color: #fff;
+        }
+
+            .btn-excel:hover {
+                background: #008f00;
+                transform: translateY(-1px);
+            }
+
+        /* Spinner nhỏ */
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #111;
+            border-radius: 50%;
+            width: 16px;
+            height: 16px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        @@keyframes spin {
+            0%
+
+        {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+
+        }
+
+        /* Loading mờ nút */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        /* In */
+        @@media print {
+            .no-print
+
+        {
+            display: none;
+        }
+
+        body {
+            margin: 0;
+        }
+
+        .report {
+            border: none;
+            padding: 20px 30px;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="no-print">
+        <a href="/Store/Dashboard">⬅ Quay lại</a>
+        <div class="no-print">
+            <button class="text-dark" id="btnPrint" onclick="window.print()">🖨 In báo cáo</button>
+            <a id="btnExcel" href="/Store/ExportReportExcel" style="margin-left: 10px;">📊 Xuất Excel</a>
+        </div>
+    </div>
+
+    <div class="report">
+        <div class="header" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+            <div style="width: 40%; line-height: 1.5; text-align: center;">
+                <strong style="font-size: 15px;">CÔNG TY TNHH DIRTYCOINS</strong><br />
+                <strong style="font-size: 15px;">DIRTYCOINS STUDIO</strong><br />
+                <hr style="width: 60%; margin: auto; border: 0; border-top: 1px solid #000;">
+            </div>
+
+            <div style="width: 50%; text-align: center; line-height: 1.5;">
+                <strong style="font-size: 15px;">CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM</strong><br />
+                <em style="font-weight: bold;">Độc lập - Tự do - Hạnh phúc</em><br />
+                <span style="display: inline-block; margin-top: 2px;">——————o0o——————</span><br />
+            </div>
+        </div>
+
+        <p style="text-align:right; margin:16px 0px; font-style:italic">
+            @city, ngày @now.Day tháng @now.Month năm @now.Year
+        </p>
+
+        <h3><b style="font-size:20px;">BÁO CÁO TÌNH TRẠNG KINH DOANH THÁNG @now.Month/@now.Year</b></h3>
+        <h5><b style="font-size:20px;">CHI NHÁNH DIRTYCOINS – @city</b></h5>
+
+        <!-- ====================== PHẦN A ====================== -->
+        <div class="section" style="margin-top:30px;">
+            <div class="section-title">A. Báo cáo kết quả kinh doanh</div>
+
+            <p><b>I. Thông tin chung</b></p>
+            <p>Tên công ty: Công ty TNHH Thời trang DirtyCoins</p>
+            <p>Chi nhánh: DirtyCoins - @store?.StoreName</p>
+            <p>Địa chỉ: @store?.Address</p>
+            <p>Quản lý cửa hàng: @store?.StoreOwner</p>
+
+            <p class="section"><b>II. Kết quả kinh doanh</b></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Chỉ tiêu</th>
+                        <th>Tháng @now.Month (₫)</th>
+                        <th>Tháng @prevMonth.Month (₫)</th>
+                        <th>Thay đổi (%)</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td class="center">1</td><td>Doanh thu COD</td><td class="right">@string.Format("{0:N0}", business.RevenueCODThis)</td><td class="right">@string.Format("{0:N0}", business.RevenueCODPrev)</td><td class="center">@Math.Round((business.RevenueCODThis - business.RevenueCODPrev) / (business.RevenueCODPrev == 0 ? 1 : business.RevenueCODPrev) * 100, 2)%</td><td>Thanh toán khi nhận hàng</td></tr>
+                    <tr><td class="center">2</td><td>Doanh thu Online</td><td class="right">@string.Format("{0:N0}", business.RevenueOnlineThis)</td><td class="right">@string.Format("{0:N0}", business.RevenueOnlinePrev)</td><td class="center">@Math.Round((business.RevenueOnlineThis - business.RevenueOnlinePrev) / (business.RevenueOnlinePrev == 0 ? 1 : business.RevenueOnlinePrev) * 100, 2)%</td><td>Thanh toán online</td></tr>
+                    <tr><td class="center">3</td><td>Tổng doanh thu</td><td class="right">@string.Format("{0:N0}", business.RevenueThis)</td><td class="right">@string.Format("{0:N0}", business.RevenuePrev)</td><td class="center">@business.GrowthRate%</td><td></td></tr>
+                    <tr><td class="center">4</td><td>Chi phí vận hành</td><td class="right">@string.Format("{0:N0}", business.CostThis)</td><td class="right">@string.Format("{0:N0}", business.CostPrev)</td><td class="center">@Math.Round((business.CostThis - business.CostPrev) / (business.CostPrev == 0 ? 1 : business.CostPrev) * 100, 2)%</td><td>Tổng chi phí hoạt động</td></tr>
+                    <tr><td class="center">5</td><td>Lợi nhuận gộp</td><td class="right">@string.Format("{0:N0}", business.GrossThis)</td><td class="right">@string.Format("{0:N0}", business.GrossPrev)</td><td class="center">@Math.Round((business.GrossThis - business.GrossPrev) / (business.GrossPrev == 0 ? 1 : business.GrossPrev) * 100, 2)%</td><td>Doanh thu - Chi phí</td></tr>
+                    <tr><td class="center">6</td><td>Lợi nhuận ròng</td><td class="right">@string.Format("{0:N0}", business.NetThis)</td><td class="right">@string.Format("{0:N0}", business.NetPrev)</td><td class="center">@Math.Round((business.NetThis - business.NetPrev) / (business.NetPrev == 0 ? 1 : business.NetPrev) * 100, 2)%</td><td>Sau thuế 10%</td></tr>
+                </tbody>
+            </table>
+
+            <p class="section"><b>III. Thống kê bổ sung</b></p>
+            <p>Sản phẩm bán chạy nhất: @business.BestProduct.Product</p> 
+            <p>Khách hàng trung bình/ngày: @ViewBag.AvgCustomers</p>
+            <p>Xu hướng doanh thu: @business.GrowthRate %</p>
+
+            <p class="section"><b>IV. Kết luận & Đề xuất</b></p>
+            <p style="text-indent: 40px;">
+                <p style="text-indent: 40px; text-align: justify; line-height: 1.6;">
+                    Trong kỳ báo cáo, hoạt động kinh doanh của chi nhánh @store?.StoreName nhìn chung diễn ra ổn định,
+                    doanh thu đạt mức tăng trưởng @business.GrowthRate% so với tháng trước.
+                    Các khoản chi phí vận hành được kiểm soát hợp lý, đảm bảo cân đối giữa doanh thu và lợi nhuận.
+                    Tuy nhiên, vẫn cần chú trọng hơn đến việc tối ưu chi phí cố định và khai thác các kênh bán hàng trực tuyến
+                    để nâng cao hiệu quả kinh doanh tổng thể.
+                </p>
+                <p style="text-indent: 40px; text-align: justify; line-height: 1.6;">
+                    Trong thời gian tới, đề xuất tiếp tục đẩy mạnh các chương trình khuyến mãi,
+                    mở rộng tệp khách hàng mục tiêu và tăng cường phối hợp giữa các bộ phận nhằm duy trì đà tăng trưởng hiện tại.
+                    Đồng thời, cần rà soát lại quy trình vận hành nội bộ để giảm thiểu chi phí phát sinh và nâng cao chất lượng phục vụ khách hàng.
+                </p>
+            </p>
+
+        <!-- ====================== PHẦN B ====================== -->
+        <div class="section">
+            <div class="section-title">B. Báo cáo tình trạng bán hàng</div>
+
+            <p><b>I. Số liệu tổng hợp</b></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Mã SP</th>
+                        <th>Tên sản phẩm</th>
+                        <th>Danh mục</th>
+                        <th>Giá (₫)</th>
+                        <th>Tồn đầu</th>
+                        <th>Nhập</th>
+                        <th>Bán</th>
+                        <th>Tồn cuối</th>
+                        <th>Giảm giá</th>
+                        <th>Trạng thái</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int i = 1;
+                        foreach (var p in sales)
+                        {
+                            <tr>
+                                <td class="center">@i</td>
+                                <td class="center">@p.Code</td>
+                                <td>@p.Product</td>
+                                <td>@p.Category</td>
+                                <td class="right">@string.Format("{0:N0}", p.Price)</td>
+                                <td class="center">@p.BeginQty</td>
+                                <td class="center">@p.Imported</td>
+                                <td class="center">@p.Sold</td>
+                                <td class="center">@p.EndQty</td>
+                                <td class="center">@p.Discount%</td>
+                                <td>@p.Status</td>
+                            </tr>
+                            ;
+                            i++;
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <p class="section"><b>II. Kết luận & Đề xuất</b></p>
+                <p style="text-indent: 40px; text-align: justify; line-height: 1.6;">
+                    Tình hình bán hàng trong tháng cho thấy các sản phẩm chủ lực của chi nhánh vẫn duy trì mức tiêu thụ tốt,
+                    đặc biệt là nhóm hàng @business.BestProduct?.Product (bán chạy nhất trong kỳ).
+                    Một số mặt hàng có dấu hiệu tồn kho cao cần được lên kế hoạch khuyến mãi hoặc điều chỉnh nhập hàng để cân đối lại lượng tồn.
+                </p>
+                <p style="text-indent: 40px; text-align: justify; line-height: 1.6;">
+                    Trong thời gian tới, đề xuất bộ phận bán hàng phối hợp với kho để theo dõi sát lượng hàng tồn,
+                    đồng thời triển khai chiến dịch marketing phù hợp cho các sản phẩm có sức tiêu thụ chậm.
+                    Bên cạnh đó, cần duy trì chất lượng dịch vụ và trải nghiệm khách hàng nhằm củng cố uy tín thương hiệu DirtyCoins
+                    trên thị trường bán lẻ thời trang.
+                </p>
+        </div>
+
+        <!-- ====================== KÝ TÊN ====================== -->
+        <div class="footer">
+            <div class="sign">
+                <p><strong>Giám đốc DirtyCoins Studio</strong></p>
+                <p>(Ký, ghi rõ họ tên)</p>
+                <br /><br /><br />
+            </div>
+            <div class="sign">
+                <p><strong>Người lập báo cáo</strong></p>
+                <p>(Ký, ghi rõ họ tên)</p>
+                <br /><br /><br />
+            </div>
+        </div>
+    </div>
+</body>
+
+<script>
+    const btnPrint = document.getElementById("btnPrint");
+    const btnExcel = document.getElementById("btnExcel");
+
+    // ================== NÚT IN ==================
+    btnPrint.addEventListener("click", () => {
+        btnPrint.classList.add("loading");
+        const spinner = document.createElement("span");
+        spinner.classList.add("spinner");
+        btnPrint.appendChild(spinner);
+
+        setTimeout(() => {
+            window.print();
+            btnPrint.classList.remove("loading");
+            spinner.remove();
+        }, 500);
+    });
+
+    // ================== NÚT XUẤT EXCEL ==================
+    btnExcel.addEventListener("click", async () => {
+        btnExcel.classList.add("loading");
+        const spinner = document.createElement("span");
+        spinner.classList.add("spinner");
+        btnExcel.appendChild(spinner);
+
+        try {
+            const response = await fetch("/Store/ExportReportExcel");
+            if (!response.ok) throw new Error("Không thể tải file");
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "BaoCaoTinhTrangKinhDoanh.xlsx";
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+        } catch (err) {
+            alert("❌ Lỗi khi tải file: " + err.message);
+        } finally {
+            btnExcel.classList.remove("loading");
+            btnExcel.querySelector(".spinner")?.remove();
+        }
+    });
+</script>
+</html>

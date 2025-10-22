@@ -1,0 +1,305 @@
+﻿@model List<DirtyCoins.Models.OperationCost>
+@{
+    ViewData["Title"] = "Tình trạng kinh doanh";
+}
+
+<style>
+    /* ========== THEME SÁNG: BÁO CÁO KINH DOANH ========== */
+    .business-status {
+        margin: 80px auto 0px;
+        color: var(--dc-text-dark);
+        padding-bottom: 40px;
+    }
+
+        .business-status h2 {
+            color: var(--dc-yellow);
+            font-family: "Bebas Neue", sans-serif;
+            letter-spacing: 0.5px;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+        }
+
+        .business-status a {
+            text-decoration: none;
+            color: var(--dc-text-dark);
+            font-weight: 500;
+        }
+
+            .business-status a:hover {
+                color: var(--dc-yellow);
+            }
+
+    .card {
+        background: #fff;
+        border-radius: 14px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        border: 1px solid #eee;
+        transition: var(--transition);
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.1);
+        }
+
+        .card h5 {
+            color: var(--dc-yellow);
+            font-weight: 600;
+            margin-bottom: 0.8rem;
+        }
+
+    table {
+        background: #fff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    }
+
+    .table thead {
+        background: var(--dc-yellow);
+        color: #111;
+        font-weight: 600;
+    }
+
+    .table td, .table th {
+        vertical-align: middle;
+    }
+
+    .table-bordered td, .table-bordered th {
+        border-color: #ddd !important;
+    }
+
+    .text-muted {
+        font-size: 0.9rem;
+        color: #666 !important;
+    }
+
+    h5 {
+        color: var(--dc-text-dark);
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .btn-primary {
+        background: var(--dc-yellow);
+        color: #111;
+        border: none;
+        font-weight: 600;
+    }
+
+        .btn-primary:hover {
+            background: #fff;
+            color: var(--dc-yellow);
+            border: 1px solid var(--dc-yellow);
+            box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+        }
+
+    canvas {
+        max-height: 350px;
+    }
+</style>
+
+<div class="container business-status">
+    <a href="/Store/Dashboard" class="mb-2 d-inline-block text-dark">⬅ Quay lại</a>
+    <h2 class="text-success">📊 Báo cáo tình trạng kinh doanh</h2>
+
+    <!-- Biểu đồ -->
+    <div class="row mt-4 g-4">
+        <div class="col-md-8">
+            <div class="card p-4">
+                <h5 class="text-success">📈 Doanh thu & Chi phí theo tháng</h5>
+                <canvas id="revenueCostChart"></canvas>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card p-4">
+                <h5 class="text-success">💸 Cơ cấu chi phí vận hành</h5>
+                <canvas id="costPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <p class="text-muted mt-3">Xem doanh thu, lợi nhuận, chi phí và xu hướng kinh doanh của cửa hàng.</p>
+
+    <!-- Bảng chỉ tiêu -->
+    <div class="mt-5">
+        <table class="table table-bordered text-center align-middle">
+            <thead>
+                <tr>
+                    <th>STT</th>
+                    <th>Chỉ tiêu</th>
+                    <th>Tháng này</th>
+                    <th>Tháng trước</th>
+                    <th>Thay đổi (%)</th>
+                    <th>Ghi chú</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>1</td>
+                    <td>Doanh thu bán hàng</td>
+                    <td>@string.Format("{0:N0}", ViewBag.RevenueThisMonth) ₫</td>
+                    <td>@string.Format("{0:N0}", ViewBag.RevenuePrevMonth) ₫</td>
+                    <td>@ViewBag.RevenueChange %</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>Doanh thu online</td>
+                    <td>@string.Format("{0:N0}", ViewBag.OnlineThisMonth) ₫</td>
+                    <td>@string.Format("{0:N0}", ViewBag.OnlinePrevMonth) ₫</td>
+                    <td>@ViewBag.OnlineChange %</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>Tổng doanh thu</td>
+                    <td>@string.Format("{0:N0}", ViewBag.TotalThisMonth) ₫</td>
+                    <td>@string.Format("{0:N0}", ViewBag.TotalPrevMonth) ₫</td>
+                    <td>@ViewBag.TotalChange %</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td>4</td>
+                    <td>Chi phí vận hành</td>
+                    <td>@string.Format("{0:N0}", ViewBag.CostThisMonth) ₫</td>
+                    <td>@string.Format("{0:N0}", ViewBag.CostPrevMonth) ₫</td>
+                    <td>@ViewBag.CostChange %</td>
+                    <td>Tiền thuê, điện, nước, lương, marketing...</td>
+                </tr>
+                <tr>
+                    <td>5</td>
+                    <td>Lợi nhuận gộp</td>
+                    <td>@string.Format("{0:N0}", ViewBag.GrossProfitThisMonth) ₫</td>
+                    <td>@string.Format("{0:N0}", ViewBag.GrossProfitPrevMonth) ₫</td>
+                    <td>@ViewBag.GrossProfitChange %</td>
+                    <td>Doanh thu - chi phí vận hành</td>
+                </tr>
+                <tr>
+                    <td>6</td>
+                    <td>Lợi nhuận ròng</td>
+                    <td>@string.Format("{0:N0}", ViewBag.NetProfitThisMonth) ₫</td>
+                    <td>@string.Format("{0:N0}", ViewBag.NetProfitPrevMonth) ₫</td>
+                    <td>@ViewBag.NetProfitChange %</td>
+                    <td>Sau thuế và chi phí khác</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Thống kê thêm -->
+    <div class="mt-4">
+        <h5>📌 Thống kê thêm</h5>
+        <p>Sản phẩm bán chạy nhất: <b>@(ViewBag.BestProduct?.Product ?? "Chưa có")</b> – SL: @(ViewBag.BestProduct?.Quantity ?? 0), Doanh thu: @string.Format("{0:N0}", ViewBag.BestProduct?.Revenue ?? 0) ₫</p>
+        <p>Khách hàng trung bình/ngày: <b>@ViewBag.AvgCustomers</b></p>
+        <p>Tăng trưởng doanh thu tháng: <b>@ViewBag.GrowthRate %</b></p>
+    </div>
+
+    <!-- Form cập nhật chi phí vận hành -->
+    <div class="mt-5">
+        <h5>📝 Cập nhật chi phí vận hành (Tháng @DateTime.Now.Month/@DateTime.Now.Year)</h5>
+        <form asp-action="UpdateOperationCosts" method="post">
+            <table class="table table-bordered align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Loại chi phí</th>
+                        <th>Số tiền (₫)</th>
+                        <th>Ghi chú</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.Count; i++)
+                    {
+                        <tr>
+                            <td>
+                                @Model[i].CostType
+                                <input type="hidden" name="[@i].CostType" value="@Model[i].CostType" />
+                                <input type="hidden" name="[@i].StoreId" value="@Model[i].IdStore" />
+                                <input type="hidden" name="[@i].CostMonth" value="@Model[i].CostMonth" />
+                                <input type="hidden" name="[@i].CostYear" value="@Model[i].CostYear" />
+                            </td>
+                            <td>
+                                <input type="number" step="1000" name="[@i].CostAmount" value="@Model[i].CostAmount" class="form-control" />
+                            </td>
+                            <td>
+                                <input type="text" name="[@i].Note" value="@Model[i].Note" class="form-control" />
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary mt-2">💾 Cập nhật chi phí</button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const revenueData = @Html.Raw(ViewBag.RevenueByMonthJson ?? "[]");
+        const costData = @Html.Raw(ViewBag.CostByMonthJson ?? "[]");
+
+        const labels = revenueData.map(r => `${r.Month}/${r.Year}`);
+        const revenueValues = revenueData.map(r => r.Revenue);
+        const costValues = costData.map(c => c.Cost);
+
+        new Chart(document.getElementById("revenueCostChart"), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: "Doanh thu (₫)",
+                        data: revenueValues,
+                        backgroundColor: "rgba(255, 215, 0, 0.6)"
+                    },
+                    {
+                        label: "Chi phí (₫)",
+                        data: costValues,
+                        backgroundColor: "rgba(54, 162, 235, 0.5)"
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'top' }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: { color: "#333" }
+                    },
+                    x: {
+                        ticks: { color: "#333" }
+                    }
+                }
+            }
+        });
+
+        // Pie chart
+        const costTypes = @Html.Raw(Json.Serialize(Model.Select(m => m.CostType).ToList()));
+        const costAmounts = @Html.Raw(Json.Serialize(Model.Select(m => m.CostAmount).ToList()));
+
+        new Chart(document.getElementById("costPieChart"), {
+            type: 'doughnut',
+            data: {
+                labels: costTypes,
+                datasets: [{
+                    data: costAmounts,
+                    backgroundColor: [
+                        "#FFD700", "#36A2EB", "#FF9F40", "#9966FF", "#4BC0C0", "#FF6384"
+                    ],
+                    borderWidth: 1,
+                    borderColor: "#fff"
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: { position: 'bottom' }
+                }
+            }
+        });
+    </script>
+}

@@ -1,0 +1,170 @@
+﻿@model IEnumerable<DirtyCoins.Models.SystemLog>
+@{
+    ViewData["Title"] = "Nhật ký hệ thống";
+}
+<style>
+    /* ===============================
+           DIRTYCOINS ADMIN THEME — SYSTEM PAGES
+           =============================== */
+    .stl-ad{
+        margin-top: 80px;
+    }
+    /* Table */
+    table.table {
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+        table.table th {
+            background: linear-gradient(135deg, #1c1c1c, #333);
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+    table.table-hover tbody tr:hover {
+        background-color: rgba(255, 240, 180, 0.3);
+        transition: 0.15s;
+    }
+
+    /* Filter form */
+    form.row.g-3.mb-3 input,
+    form.row.g-3.mb-3 button {
+        border-radius: 10px;
+    }
+
+    form.row.g-3.mb-3 button {
+        padding: 0.45rem 1rem;
+        font-weight: 500;
+    }
+
+    /* Card confirm */
+    .card {
+        border-radius: 16px;
+        border: none;
+        background: #fff;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        animation: fadeIn 0.3s ease;
+    }
+
+        .card h3 {
+            font-weight: 700;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+        }
+
+    .btn {
+        border-radius: 10px !important;
+        font-weight: 500;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #c31432, #ff4b2b);
+        border: none;
+    }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+    .btn-outline-secondary:hover {
+        background: #eee;
+    }
+
+    .alert {
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, #fff6d3, #fff4b1);
+        border: 1px solid #ffe98b;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+</style>
+
+<div class="container stl-ad">
+    <a href="/Admin/Dashboard" class="text-decoration-none mb-3 d-inline-block text-dark">⬅ Quay lại</a>
+    <h3 class="fw-bold text-primary">📜 Nhật ký hoạt động hệ thống</h3>
+    <p class="text-muted">Hiển thị 100 hoạt động gần nhất.</p>
+
+    <!-- Bộ lọc -->
+    <form method="get" class="row g-3 mb-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label fw-semibold">🔍 Tìm theo hành động</label>
+            <input type="text" name="searchAction" value="@ViewBag.SearchAction" class="form-control" placeholder="Ví dụ: Cập nhật, Xóa...">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Từ ngày</label>
+            <input type="date" name="fromDate" value="@ViewBag.FromDate" class="form-control">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label fw-semibold">Đến ngày</label>
+            <input type="date" name="toDate" value="@ViewBag.ToDate" class="form-control">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Tìm</button>
+        </div>
+    </form>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="table table-striped table-hover mt-3 align-middle">
+                <thead>
+                    <tr>
+                        <th style="width:50px;">#</th>
+                        <th>Người dùng</th>
+                        <th>Vai trò</th>
+                        <th>Hành động</th>
+                        <th>Thời gian</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @{
+                        int index = 1;
+                    }
+                    @foreach (var log in Model)
+                    {
+                        <tr>
+                            <td>@index</td>
+                            <td>@(log.User?.Username ?? "Hệ thống")</td>
+                            <td>
+                                <span class="badge bg-secondary">@((log.User?.Role) ?? "-")</span>
+                            </td>
+                            <td class="text-start">@log.Action</td>
+                            <td>@log.TimeStamp.ToLocalTime().ToString("dd/MM/yyyy HH:mm:ss")</td>
+                        </tr>
+                        index++;
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-4 text-center">
+            Chưa có bản ghi nào trong hệ thống.
+        </div>
+    }
+</div>

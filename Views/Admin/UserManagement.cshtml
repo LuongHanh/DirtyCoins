@@ -1,0 +1,660 @@
+﻿@{
+    ViewData["Title"] = "Quản lý tài khoản";
+    var customers = ViewBag.Customers as List<DirtyCoins.Models.User> ?? new();
+    var others = ViewBag.Others as List<DirtyCoins.Models.User> ?? new();
+    var roles = new List<string> { "Staff", "StoreOwner", "Director", "Admin" };
+    var storeList = ViewBag.Stores as IEnumerable<dynamic> ?? new List<dynamic>();
+}
+
+<style>
+    /* ===============================
+           DIRTYCOINS ADMIN USER MANAGEMENT
+           =============================== */
+    .admin-users {
+        background: var(--dc-bg-soft);
+        color: var(--dc-text-dark);
+        padding: 2rem 75px 4rem;
+        min-height: 100vh;
+    }
+
+    h3.page-title {
+        font-family: 'Bebas Neue', sans-serif;
+        font-size: 2.4rem;
+        color: var(--dc-dark);
+        letter-spacing: 1px;
+        margin-bottom: 1rem;
+        text-align: center;
+    }
+
+    a.back-link {
+        color: var(--dc-dark);
+        text-decoration: none;
+        font-weight: 500;
+        display: inline-block;
+        margin-left: 15px;
+        transition: 0.2s;
+    }
+
+        a.back-link:hover {
+            color: var(--dc-yellow);
+            transform: translateX(-3px);
+        }
+
+    .card {
+        border: none;
+        border-radius: 18px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+        background: #fff;
+        transition: all 0.25s ease;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+
+    .card-header {
+        border-radius: 18px 18px 0 0 !important;
+        font-weight: 600;
+    }
+
+    .table th {
+        text-transform: uppercase;
+        font-size: 0.85rem;
+        letter-spacing: 0.5px;
+        background: #fafafa;
+    }
+
+    td.truncate {
+        max-width: 180px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+
+    .table-hover tbody tr:hover {
+        background: #f5f6f7;
+    }
+
+    /* Badge & status */
+    .badge {
+        border-radius: 12px;
+        font-weight: 500;
+        padding: 0.35rem 0.6rem;
+    }
+
+    .bg-purple {
+        background-color: #6f42c1 !important;
+    }
+
+    /* Modal style */
+    .modal-content {
+        border-radius: 20px;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.25);
+    }
+
+    .modal-header.bg-primary {
+        color: #fff;
+    }
+
+    .btn-close {
+        filter: brightness(0) invert(1);
+    }
+
+    /* Scrollbar tinh tế */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #ccc;
+        border-radius: 4px;
+    }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
+    /* Tìm kiếm filter */
+    .filter-tools input,
+    .filter-tools select {
+        border-radius: 20px !important;
+    }
+
+    /* Modal alert */
+    #formAlert {
+        border-radius: 12px;
+    }
+    /* ===============================
+           🔹 MODAL STYLE — DIRTYCOINS ADMIN
+           =============================== */
+
+    .modal-content {
+        border-radius: 20px;
+        border: none;
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+        overflow: hidden;
+        background: #fff;
+        animation: modalFadeIn 0.3s ease;
+    }
+
+    @@keyframes modalFadeIn {
+        from
+
+    {
+        transform: translateY(-15px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+
+    }
+
+    /* Header */
+    .modal-header {
+        background: linear-gradient(135deg, var(--dc-dark) 0%, #222 100%);
+        color: #fff;
+        border-bottom: none;
+        align-items: center;
+        margin-top: 60px;
+    }
+
+        .modal-header.bg-primary {
+            background: linear-gradient(135deg, #007bff 0%, #004d99 100%);
+        }
+
+        .modal-header .modal-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 1.6rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+            transition: 0.2s;
+        }
+
+            .modal-header .btn-close:hover {
+                opacity: 1;
+                transform: rotate(90deg);
+            }
+
+    /* Body */
+    .modal-body {
+        padding: 1.8rem;
+        background: #fafafa;
+    }
+
+        .modal-body label.form-label {
+            font-weight: 600;
+            color: #333;
+        }
+
+        .modal-body input,
+        .modal-body select {
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            padding: 0.6rem 0.9rem;
+            transition: border 0.2s;
+        }
+
+            .modal-body input:focus,
+            .modal-body select:focus {
+                border-color: var(--dc-yellow);
+                box-shadow: 0 0 0 3px rgba(255, 204, 0, 0.25);
+                outline: none;
+            }
+
+        /* Section heading trong modal */
+        .modal-body h6.text-success {
+            font-weight: 700;
+            font-size: 1.05rem;
+            margin-bottom: 0.6rem;
+        }
+
+    /* Footer */
+    .modal-footer {
+        background: #f2f2f2;
+        border-top: none;
+        padding: 1rem 1.8rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        border-radius: 0 0 20px 20px;
+    }
+
+        .modal-footer .btn {
+            border-radius: 12px;
+            padding: 0.55rem 1.2rem;
+            font-weight: 500;
+        }
+
+        .modal-footer .btn-primary {
+            background-color: var(--dc-dark);
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+            .modal-footer .btn-primary:hover {
+                background-color: var(--dc-yellow);
+                color: #111;
+                transform: translateY(-1px);
+            }
+
+        .modal-footer .btn-secondary {
+            background-color: #ccc;
+            color: #111;
+        }
+
+    /* Alert đẹp trong modal */
+    #formAlert {
+        border-radius: 12px;
+        margin-bottom: 0.8rem;
+        font-weight: 500;
+        animation: fadeIn 0.3s ease;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-5px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+
+    /* Custom scroll cho form dài */
+    .modal-body::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+        background-color: #bbb;
+        border-radius: 4px;
+    }
+
+        .modal-body::-webkit-scrollbar-thumb:hover {
+            background-color: #999;
+        }
+</style>
+
+<div class="container-fluid mt-4 admin-users">
+    <a href="/Admin/Dashboard" class="back-link">⬅ Quay lại</a>
+    <h3 class="page-title">📋 Quản lý tài khoản người dùng hệ thống</h3>
+
+    <!-- Flash messages -->
+    @if (TempData?["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+            @TempData["Success"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+    @if (TempData?["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row mt-4">
+        <!-- ====== KHÁCH HÀNG ====== -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                    <span>👥 50 khách hàng mới</span>
+                    <div class="filter-tools d-flex gap-2">
+                        <input id="searchCustomer" type="text" class="form-control form-control-sm" placeholder="🔍 Tìm tên..." style="width: 160px;">
+                        <select id="filterCustomerStatus" class="form-select form-select-sm" style="width: 120px;">
+                            <option value="">Tất cả</option>
+                            <option value="active">Hoạt động</option>
+                            <option value="locked">Bị khóa</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="card-body p-0" style="max-height:500px; overflow-y:auto;">
+                    <table class="table table-hover mb-0" id="customerTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Email</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (customers.Any())
+                            {
+                                foreach (var u in customers)
+                                {
+                                    <tr data-name="@u.Username.ToLower()" data-status="@(u.IsActive ? "active" : "locked")">
+                                        <td>@u.IdUser</td>
+                                        <td class="truncate">@u.Username</td>
+                                        <td class="truncate">@u.Email</td>
+                                        <td><span class="badge @(u.IsActive ? "bg-success" : "bg-danger")">@(u.IsActive ? "Active" : "Locked")</span></td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="4" class="text-center text-muted">Không có dữ liệu</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ====== NHÂN SỰ & QUẢN TRỊ ====== -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                    <div>👔 Nhân sự <span class="badge bg-light text-dark ms-2" id="staffCount">@others.Count</span></div>
+                    <div class="filter-tools d-flex gap-2">
+                        <input id="searchStaff" type="text" class="form-control form-control-sm" placeholder="🔍 Tìm tên..." style="width: 160px;">
+                        <select id="filterStaffStatus" class="form-select form-select-sm" style="width: 120px;">
+                            <option value="">Tất cả</option>
+                            <option value="active">Hoạt động</option>
+                            <option value="locked">Bị khóa</option>
+                        </select>
+                        <button class="btn btn-light btn-sm" data-bs-toggle="modal" data-bs-target="#createUserModal">➕ User</button>
+                    </div>
+                </div>
+                <div class="card-body p-0" style="max-height:500px; overflow-y:auto;">
+                    <table class="table table-hover mb-0" id="staffTable">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên đăng nhập</th>
+                                <th>Email</th>
+                                <th>Vai trò</th>
+                                <th>Trạng thái</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @if (others.Any())
+                            {
+                                foreach (var u in others)
+                                {
+                                    string roleClass = u.Role?.ToLower() switch
+                                    {
+                                        "admin" => "bg-danger",
+                                        "director" => "bg-purple text-white",
+                                        "storeowner" => "bg-info text-dark",
+                                        "staff" => "bg-success",
+                                        _ => "bg-secondary"
+                                    };
+
+                                    string roleLabel = u.Role switch
+                                    {
+                                        "Admin" => "Quản trị viên",
+                                        "Director" => "Giám đốc",
+                                        "StoreOwner" => "Chủ cửa hàng",
+                                        "Staff" => "Nhân viên",
+                                        _ => u.Role
+                                    };
+                                    <tr data-name="@u.Username.ToLower()" data-status="@(u.IsActive ? "active" : "locked")">
+                                        <td>@u.IdUser</td>
+                                        <td class="truncate">@u.Username</td>
+                                        <td class="truncate">@u.Email</td>
+                                        <td><span class="badge rounded-pill @roleClass px-3 py-2">@roleLabel</span></td>
+                                        <td><span class="badge @(u.IsActive ? "bg-success" : "bg-danger")">@(u.IsActive ? "Active" : "Locked")</span></td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                                <tr><td colspan="5" class="text-center text-muted">Không có dữ liệu</td></tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal tạo user -->
+<div class="modal fade" id="createUserModal" tabindex="-1" aria-labelledby="createUserLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="createUserLabel">➕ Tạo tài khoản người dùng mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+
+            <div class="modal-body">
+                <form id="createUserForm" asp-action="CreateUser" asp-controller="Admin" method="post">
+                    <!-- Vai trò -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Chọn vai trò</label>
+                        <select id="roleSelect" name="role" class="form-select" required>
+                            <option value="">-- Chọn vai trò --</option>
+                            @foreach (var r in roles)
+                            {
+                                <option value="@r">@r</option>
+                            }
+                        </select>
+                    </div>
+
+                    <!-- Thông tin cơ bản -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tên đăng nhập</label>
+                            <input name="username" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" class="form-control" />
+                        </div>
+                    </div>
+
+                    <!-- Mật khẩu + Xác nhận -->
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Mật khẩu</label>
+                            <input type="password" name="password" id="password" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Xác nhận mật khẩu</label>
+                            <input type="password" id="confirmPassword" class="form-control" required />
+                        </div>
+                    </div>
+
+                    <div id="extraFields"></div>
+                </form>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="submit" form="createUserForm" class="btn btn-primary">Tạo tài khoản</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const stores = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(storeList));
+
+        const roleSelect = document.getElementById("roleSelect");
+        const extraFields = document.getElementById("extraFields");
+        const form = document.getElementById("createUserForm");
+        const password = document.getElementById("password");
+        const confirmPassword = document.getElementById("confirmPassword");
+
+        // 🔹 Khi chưa chọn vai trò -> disable tất cả input
+        const toggleInputs = (disabled) => {
+            form.querySelectorAll("input, select").forEach(el => {
+                if (el.id !== "roleSelect") el.disabled = disabled;
+            });
+        };
+        toggleInputs(true);
+
+        // 🔹 Khi chọn vai trò -> bật nhập
+        roleSelect.addEventListener("change", function () {
+            const role = this.value.toLowerCase();
+            extraFields.innerHTML = "";
+            toggleInputs(role === ""); // bật lại input nếu có vai trò
+
+            if (role === "staff") {
+                let options = stores.map(s => `<option value="${s.IdStore}">${s.StoreName}</option>`).join("");
+                extraFields.innerHTML = `
+                    <hr/>
+                    <h6 class="text-success">Thông tin nhân viên</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Họ tên</label>
+                            <input name="fullName" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Chức vụ</label>
+                            <input name="position" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Thuộc cửa hàng</label>
+                        <select name="idStore" class="form-select" required>
+                            <option value="">-- Chọn cửa hàng --</option>
+                            ${options}
+                        </select>
+                    </div>`;
+            } 
+            else if (role === "storeowner") {
+                extraFields.innerHTML = `
+                    <hr/>
+                    <h6 class="text-success">Thông tin cửa hàng</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tên cửa hàng</label>
+                            <input name="storeName" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Địa chỉ</label>
+                            <input name="storeAddress" class="form-control" required />
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Tên chủ cửa hàng</label>
+                            <input name="storeOwner" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <input name="phone" class="form-control" />
+                        </div>
+                    </div>`;
+            } 
+            else if (role === "director") {
+                extraFields.innerHTML = `
+                    <hr/>
+                    <h6 class="text-success">Thông tin giám đốc</h6>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Họ tên</label>
+                            <input name="fullName" class="form-control" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Số điện thoại</label>
+                            <input name="phone" class="form-control" />
+                        </div>
+                    </div>`;
+            }
+        });
+
+        // 🔹 Check mật khẩu trùng khớp realtime
+        confirmPassword.addEventListener("input", () => {
+            if (confirmPassword.value && confirmPassword.value !== password.value) {
+                confirmPassword.setCustomValidity("Mật khẩu không khớp!");
+                confirmPassword.classList.add("is-invalid");
+            } else {
+                confirmPassword.setCustomValidity("");
+                confirmPassword.classList.remove("is-invalid");
+            }
+        });
+
+        // 🔹 Validate trước khi submit
+        form.addEventListener("submit", (e) => {
+            const role = roleSelect.value.trim();
+            if (!role) {
+                e.preventDefault();
+                showAlert("Vui lòng chọn vai trò trước khi tạo tài khoản!", "warning");
+                return;
+            }
+
+            // Check form hợp lệ
+            if (!form.checkValidity()) {
+                e.preventDefault();
+                showAlert("Vui lòng nhập đầy đủ thông tin bắt buộc!", "danger");
+                form.classList.add("was-validated");
+            }
+        });
+
+        // 🔹 Hiển thị alert đẹp trong modal
+        function showAlert(message, type = "info") {
+            const existing = document.querySelector("#formAlert");
+            if (existing) existing.remove();
+
+            const alert = document.createElement("div");
+            alert.id = "formAlert";
+            alert.className = `alert alert-${type} mt-2 alert-dismissible fade show`;
+            alert.innerHTML = `${message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+            form.prepend(alert);
+        }
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // 🔍 Hàm lọc cho từng bảng
+            function setupTableSearch(tableId, searchId, filterId) {
+                const table = document.getElementById(tableId);
+                const searchInput = document.getElementById(searchId);
+                const filterSelect = document.getElementById(filterId);
+
+                function applyFilter() {
+                    const keyword = searchInput.value.trim().toLowerCase();
+                    const status = filterSelect.value;
+
+                    let visibleCount = 0;
+                    table.querySelectorAll("tbody tr").forEach(row => {
+                        const name = row.dataset.name || "";
+                        const rowStatus = row.dataset.status || "";
+                        const matchName = name.includes(keyword);
+                        const matchStatus = !status || rowStatus === status;
+
+                        if (matchName && matchStatus) {
+                            row.style.display = "";
+                            visibleCount++;
+                        } else {
+                            row.style.display = "none";
+                        }
+                    });
+                    return visibleCount;
+                }
+
+                searchInput.addEventListener("input", applyFilter);
+                filterSelect.addEventListener("change", applyFilter);
+            }
+
+            // Áp dụng cho 2 bảng
+            setupTableSearch("customerTable", "searchCustomer", "filterCustomerStatus");
+            setupTableSearch("staffTable", "searchStaff", "filterStaffStatus");
+        });
+    </script>
+}
+

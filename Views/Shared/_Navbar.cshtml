@@ -1,0 +1,187 @@
+﻿@using System.Security.Claims
+@inject IHttpContextAccessor HttpContextAccessor
+@using DirtyCoins.Data
+@inject ApplicationDbContext _context
+@using DirtyCoins.Helpers
+
+@{
+    var cartJson = HttpContextAccessor.HttpContext.Request.Cookies["cart"];
+    var cart = string.IsNullOrEmpty(cartJson)
+        ? new List<DirtyCoins.Controllers.CartController.CartItem>()
+        : Newtonsoft.Json.JsonConvert.DeserializeObject<List<DirtyCoins.Controllers.CartController.CartItem>>(cartJson);
+
+    var cartCount = cart?.Sum(c => c.Quantity) ?? 0;
+}
+
+<nav class="navbar navbar-expand-lg navbar-dc shadow-sm">
+    <div class="container">
+        <!-- LOGO -->
+        <a class="navbar-brand d-flex align-items-center" asp-controller="Home" asp-action="Index">
+            <i class="bi bi-gem me-2 text-gold"></i> DIRTYCOINS
+        </a>
+
+        <!-- TOGGLER -->
+        <button class="navbar-toggler border-0 text-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <i class="bi bi-list fs-3"></i>
+        </button>
+
+        <!-- NAV ITEMS -->
+        <div id="navbarNav" class="collapse navbar-collapse">
+            <ul class="navbar-nav me-auto align-items-lg-center">
+                <li class="nav-item"><a class="nav-link" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" asp-controller="Product" asp-action="Index">Sản phẩm</a></li>
+                <li class="nav-item">
+                    <a class="nav-link d-flex align-items-center" asp-controller="Cart" asp-action="Index" id="cartNavLink">
+                        <i class="bi bi-bag-check me-1"></i> Giỏ hàng
+                        <span id="cartCountBadge" class="badge bg-danger ms-1">@cartCount</span>
+                    </a>
+                </li>
+            </ul>
+
+            @* =============== CHI NHÁNH DROPDOWN =============== *@
+            @{
+                var selectedStoreId = HttpContextAccessor.HttpContext.Session.GetInt32("SelectedStore");
+                var currentStore = selectedStoreId.HasValue
+                ? _context.Stores.FirstOrDefault(s => s.IdStore == selectedStoreId.Value)
+                : null;
+
+                double? distanceKm = null;
+
+                if (User.Identity.IsAuthenticated)
+                {
+                    var userIdClaim = User.FindFirst("AppUserId")?.Value;
+                    if (int.TryParse(userIdClaim, out int idUser))
+                    {
+                        var customer = _context.Customers.FirstOrDefault(c => c.IdUser == idUser);
+                        if (customer != null && customer.Latitude.HasValue && customer.Longitude.HasValue &&
+                        currentStore != null && currentStore.Latitude.HasValue && currentStore.Longitude.HasValue)
+                        {
+                            distanceKm = LocationHelper.CalculateDistance(
+                            customer.Latitude.Value,
+                            customer.Longitude.Value,
+                            currentStore.Latitude.Value,
+                            currentStore.Longitude.Value
+                            );
+                        }
+                    }
+                }
+
+                var stores = _context.Stores.ToList();
+                string branchName = currentStore?.StoreName?.Contains("-") == true
+                ? currentStore.StoreName.Split('-').Last().Trim()
+                : currentStore?.StoreName ?? "Chưa chọn";
+            }
+
+            <ul class="navbar-nav align-items-center me-3">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle fw-semibold text-light" href="#" id="branchDropdown" data-bs-toggle="dropdown">
+                        <i class="bi bi-shop me-1 text-gold"></i> Chi nhánh:
+                        <span class="text-gold text-truncate-branch">@branchName</span>
+                        @if (distanceKm.HasValue)
+                        {
+                            <span class="text-muted small">(@Math.Round(distanceKm.Value, 1) km)</span>
+                        }
+                    </a>
+                    <ul class="dropdown-menu">
+                        @if (stores.Any())
+                        {
+                            @foreach (var store in stores)
+                            {
+                                <li>
+                                    <a class="dropdown-item @(store.IdStore == selectedStoreId ? "active fw-bold text-gold" : "")"
+                                       href="@Url.Action("ChangeStore", "Home", new { id = store.IdStore })">
+                                        @store.StoreName @(store.IdStore == selectedStoreId ? "✅" : "")
+                                    </a>
+                                </li>
+                            }
+                        }
+                        else
+                        {
+                            <li><span class="dropdown-item text-muted">Không có chi nhánh</span></li>
+                        }
+                    </ul>
+                </li>
+            </ul>
+
+            @* =============== USER ACCOUNT DROPDOWN =============== *@
+            <ul class="navbar-nav align-items-center">
+                @if (User?.Identity?.IsAuthenticated ?? false)
+                {
+                    var fullName = User.FindFirst("FullName")?.Value ?? "Người dùng";
+                    var role = User.FindFirst(ClaimTypes.Role)?.Value ?? "Guest";
+                    string iconClass = role switch
+                    {
+                        "Customer" => "bi-person-circle text-info",
+                        "Staff" => "bi-person-badge text-warning",
+                        "StoreOwner" => "bi-shop text-success",
+                        "Director" => "bi-briefcase text-primary",
+                        "Admin" => "bi-shield-lock text-danger",
+                        _ => "bi-person"
+                    };
+                    string dashboardController = role switch
+                    {
+                        "Customer" => "Customer",
+                        "Staff" => "Staff",
+                        "StoreOwner" => "Store",
+                        "Director" => "Director",
+                        "Admin" => "Admin",
+                        _ => "Account"
+                    };
+
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle fw-semibold d-flex align-items-center text-light" asp-controller="@dashboardController" asp-action="Dashboard" data-bs-toggle="dropdown">
+                            <i class="@iconClass me-1"></i>@fullName
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            @switch (role)
+                            {
+                                case "Customer":
+                                    <li><a class="dropdown-item" asp-controller="Customer" asp-action="Dashboard">Trang cá nhân</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Customer" asp-action="Orders">Đơn hàng của tôi</a></li>
+                                    break;
+                                case "Staff":
+                                    <li><a class="dropdown-item" asp-controller="Staff" asp-action="Dashboard">Bảng điều khiển</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Staff" asp-action="ManageOrders">Quản lý đơn hàng</a></li>
+                                    break;
+                                case "StoreOwner":
+                                    <li><a class="dropdown-item" asp-controller="Store" asp-action="Dashboard">Quản lý cửa hàng</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Store" asp-action="BusinessStatus">Doanh thu</a></li>
+                                    break;
+                                case "Director":
+                                    <li><a class="dropdown-item" asp-controller="Director" asp-action="Dashboard">Tổng quan hệ thống</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Director" asp-action="Analytics">Phân tích</a></li>
+                                    break;
+                                case "Admin":
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="Dashboard">Quản trị hệ thống</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Admin" asp-action="UserManagement">Quản lý người dùng</a></li>
+                                    break;
+                            }
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <a class="dropdown-item text-danger" asp-controller="Account" asp-action="Logout">
+                                    <i class="bi bi-box-arrow-right me-1"></i> Đăng xuất
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a asp-controller="Account" asp-action="Login" class="btn btn-login">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Đăng nhập
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<script>
+    // Update cart badge dynamically
+    function updateCartCount(count) {
+        var cartBadge = document.getElementById("cartCountBadge");
+        if (cartBadge) cartBadge.textContent = count;
+    }
+</script>

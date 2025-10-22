@@ -1,0 +1,101 @@
+﻿@{
+    ViewData["Title"] = "Đăng nhập";
+    Layout = "_Layout";
+}
+
+<style>
+    /* ---------- LOGIN PAGE (DirtyCoins Style) ---------- */
+    .auth-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 0;
+        margin-top: 20px;
+    }
+
+    .auth-card {
+        background: #fff;
+        padding: 2.5rem 2rem;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        width: 100%;
+        max-width: 480px;
+    }
+
+        .auth-card h3 {
+            font-family: 'Bebas Neue', sans-serif;
+            letter-spacing: 1px;
+            font-size: 2rem;
+            color: var(--dc-dark);
+        }
+
+        .auth-card .btn-primary {
+            background: var(--dc-yellow);
+            color: #111;
+            font-weight: 600;
+            border: none;
+            border-radius: 30px;
+            transition: var(--transition);
+        }
+
+            .auth-card .btn-primary:hover {
+                background: #111;
+                color: var(--dc-yellow);
+                transform: translateY(-2px);
+            }
+
+        .auth-card .btn-outline-danger {
+            border-radius: 30px;
+            font-weight: 600;
+        }
+
+        .auth-card a {
+            color: var(--dc-yellow);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+            .auth-card a:hover {
+                text-decoration: underline;
+            }
+</style>
+
+<section class="auth-page">
+    <div class="auth-card">
+        <h3 class="text-center mb-4 text-uppercase">Đăng nhập tài khoản</h3>
+
+        @if (ViewBag.Error != null)
+        {
+            <div class="alert alert-danger">@ViewBag.Error</div>
+        }
+
+        <form asp-controller="Account" asp-action="Login" method="post">
+            <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+
+            <div class="mb-3">
+                <label class="form-label">Tên đăng nhập hoặc Email</label>
+                <input type="text" class="form-control" name="usernameOrEmail" required />
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Mật khẩu</label>
+                <input type="password" class="form-control" name="password" required />
+            </div>
+
+            <button type="submit" class="btn btn-primary w-100">Đăng nhập</button>
+        </form>
+
+        <div class="text-center mt-4">
+            <p class="text-muted mb-2">Hoặc</p>
+            <a href="/Account/LoginGoogle" class="btn btn-outline-danger w-100">
+                <i class="bi bi-google"></i> Đăng nhập bằng Google
+            </a>
+        </div>
+
+        <p class="text-center mt-3 text-muted">
+            Chưa có tài khoản?
+            <a asp-controller="Account" asp-action="Register">Đăng ký ngay</a>
+        </p>
+    </div>
+</section>

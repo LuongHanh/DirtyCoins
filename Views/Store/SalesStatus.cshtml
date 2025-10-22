@@ -1,0 +1,248 @@
+﻿@{
+    ViewData["Title"] = "Tình trạng bán hàng";
+    var sales = ViewBag.SalesTable as IEnumerable<dynamic>;
+}
+
+<style>
+    .st-dc{
+        margin: 60px auto 0px;
+        padding-bottom: 40px;
+    }
+</style>
+
+<div class="container dirtycoins-body st-dc">
+    <a href="/Store/Dashboard" class="fw-semibold text-dark">⬅ Quay lại</a></br>
+    <h2 class="text-success" style="margin-top: 8px; text-transform: uppercase; border-bottom: none; font-family: 'Bebas Neue', sans-serif;">
+        📦 Tình trạng bán hàng
+    </h2>
+
+    <!-- Biểu đồ -->
+    <div class="row mt-4">
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm hover-glow p-3 h-100">
+                <h5 class="fw-semibold text-dark mb-2">Biểu đồ bán theo nhóm sản phẩm</h5>
+                <canvas id="chartByCategory" style="height:250px;"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm hover-glow p-3 h-100">
+                <h5 class="fw-semibold text-dark mb-2">Top 5 sản phẩm bán chạy</h5>
+                <canvas id="chartBest" style="height:300px;"></canvas>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-3">
+            <div class="card border-0 shadow-sm hover-glow p-3 h-100">
+                <h5 class="fw-semibold text-dark mb-2">Top 5 sản phẩm bán chậm</h5>
+                <canvas id="chartSlow" style="height:300px;"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <p class="text-muted mt-3">
+        Quản lý tồn kho, sản phẩm bán chạy/chậm và xu hướng bán hàng.
+    </p>
+
+    <!-- Bảng chi tiết -->
+    <div class="table-responsive mt-4">
+        <table class="table align-middle text-center shadow-sm">
+            <thead class="bg-gold text-dark">
+                <tr>
+                    <th>STT</th>
+                    <th>Mã sản phẩm</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Loại</th>
+                    <th>Giá bán</th>
+                    <th>Tồn đầu kỳ</th>
+                    <th>Nhập</th>
+                    <th>Bán</th>
+                    <th>Tồn cuối</th>
+                    <th>Khuyến mãi (%)</th>
+                    <th>Tình trạng</th>
+                </tr>
+            </thead>
+            <tbody>
+                @{
+                    int idx = 1;
+                    foreach (var p in sales)
+                    {
+                        <tr>
+                            <td>@idx</td>
+                            <td class="fw-medium">@p.Code</td>
+                            <td class="text-start">@p.Product</td>
+                            <td>@p.Category</td>
+                            <td class="text-end">@string.Format("{0:N0}", p.Price) ₫</td>
+                            <td>@p.BeginQty</td>
+                            <td>@p.Imported</td>
+                            <td>@p.Sold</td>
+                            <td>@p.EndQty</td>
+                            <td>@p.Discount %</td>
+                            <td>
+                                <span class="badge px-3 py-2 rounded-pill fw-semibold
+                                    @(p.Status == "Bán chạy" ? "bg-green text-light" :
+                                    p.Status == "Tồn nhiều" ? "bg-danger text-light" :
+                                    p.Status == "Bình thường" ? "bg-warning text-dark" :
+                                    "bg-secondary text-light")">
+                                    @p.Status
+                                </span>
+                            </td>
+                        </tr>
+                        ;
+                        idx++;
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    /* ================================
+           Đồng bộ theo DirtyCoins Theme
+           ================================ */
+    .card {
+        border-radius: 14px;
+        background: var(--dc-light);
+        transition: var(--transition);
+    }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1) !important;
+        }
+
+    .table {
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--dc-light);
+        border: 1px solid #eee;
+    }
+
+        .table th {
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            font-size: 0.9rem;
+            border-color: #f4f4f4 !important;
+        }
+
+        .table td {
+            padding: 9px 10px;
+            vertical-align: middle;
+            border-color: #f6f6f6 !important;
+        }
+
+        .table tbody tr:nth-child(even) {
+            background: #FBFBFB;
+        }
+
+        .table tbody tr:hover {
+            background: rgba(255, 215, 0, 0.08);
+            transition: var(--transition);
+        }
+
+    .text-green {
+        color: var(--dc-green) !important;
+    }
+
+    .text-dark {
+        color: var(--dc-text-dark) !important;
+    }
+
+    h2 {
+        border-bottom: 3px solid var(--dc-yellow);
+        display: inline-block;
+        padding-bottom: 3px;
+        letter-spacing: 0.5px;
+    }
+</style>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const chartByCategory = @Html.Raw(ViewBag.ChartByCategoryJson ?? "[]");
+        const best = @Html.Raw(ViewBag.ChartBestJson ?? "[]");
+        const slow = @Html.Raw(ViewBag.ChartSlowJson ?? "[]");
+
+        // --- Biểu đồ theo nhóm sản phẩm
+        new Chart(document.getElementById("chartByCategory"), {
+            type: 'pie',
+            data: {
+                labels: chartByCategory.map(c => c.Category),
+                datasets: [{
+                    data: chartByCategory.map(c => c.Sold),
+                    backgroundColor: [
+                        "#4caf50", "#2196f3", "#ff9800", "#9c27b0", "#f44336"
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ctx.label + ": " + ctx.formattedValue + " sp";
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // --- Top bán chạy
+        new Chart(document.getElementById("chartBest"), {
+            type: 'bar',
+            data: {
+                labels: best.map(p => p.Product),
+                datasets: [{
+                    label: "Số lượng bán",
+                    data: best.map(p => p.Sold),
+                    backgroundColor: "rgba(75, 192, 192, 0.7)"
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y',
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ctx.dataset.label + ": " + ctx.formattedValue + " sp";
+                            }
+                        }
+                    }
+                },
+                scales: { x: { beginAtZero: true } }
+            }
+        });
+
+        // --- Top bán chậm
+        new Chart(document.getElementById("chartSlow"), {
+            type: 'bar',
+            data: {
+                labels: slow.map(p => p.Product),
+                datasets: [{
+                    label: "Số lượng bán",
+                    data: slow.map(p => p.Sold),
+                    backgroundColor: "rgba(255, 99, 132, 0.7)"
+                }]
+            },
+            options: {
+                responsive: true,
+                indexAxis: 'y',
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(ctx) {
+                                return ctx.dataset.label + ": " + ctx.formattedValue + " sp";
+                            }
+                        }
+                    }
+                },
+                scales: { x: { beginAtZero: true } }
+            }
+        });
+    </script>
+}

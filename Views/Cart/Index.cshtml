@@ -1,0 +1,277 @@
+﻿@model List<DirtyCoins.ViewModels.CartItemViewModel>
+
+@{
+    ViewData["Title"] = "Giỏ hàng";
+    Layout = "_Layout";
+}
+
+<style>
+    /* ---------- CART PAGE (DirtyCoins Style) ---------- */
+    .cart-page {
+        background: radial-gradient(circle at 20% 10%, #fffefb 0%, #fff9ec 30%, #fff4d9 70%, #f3efe7 100%);
+        min-height: 90vh;
+        padding: 2rem 0 4rem;
+        margin-top: 40px;
+    }
+
+    .cart-table {
+        border-radius: 14px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.05);
+    }
+
+    .cart-table th {
+        background: var(--dc-dark);
+        color: var(--dc-light);
+        font-weight: 600;
+        letter-spacing: 0.3px;
+    }
+
+    .cart-table td {
+        vertical-align: middle;
+    }
+
+    .cart-table img {
+        max-width: 80px;
+        border-radius: 10px;
+        transition: transform 0.2s ease;
+    }
+
+    .cart-table img:hover {
+        transform: scale(1.05);
+    }
+
+    .btn-outline-danger:hover {
+        background-color: crimson;
+        color: #fff;
+    }
+
+    #totalAmount {
+        color: var(--dc-green);
+    }
+
+    #checkoutSelected {
+        background: var(--dc-yellow);
+        color: #111;
+        font-weight: 600;
+        border-radius: 25px;
+        transition: var(--transition);
+    }
+
+    #checkoutSelected:hover {
+        background: #fff;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+</style>
+
+<div class="cart-page">
+    <div class="container mt-4">
+    <h2 class="mb-4">🛒 Giỏ hàng của bạn</h2>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-info text-center">
+            Giỏ hàng của bạn đang trống.
+            <a href="@Url.Action("Index", "Product")" class="btn btn-outline-primary btn-sm ms-2">Xem sản phẩm</a>
+        </div>
+    }
+    else
+    {
+        <table class="table table-bordered align-middle shadow-sm">
+            <thead class="table-light">
+                <tr class="text-center">
+                    <th style="width: 50px;">
+                        <input type="checkbox" id="selectAll" title="Chọn tất cả" checked/>
+                    </th>
+                    <th style="width: 100px;">Hình ảnh</th>
+                    <th style="width: 30%;">Tên sản phẩm</th>
+                    <th>Đơn giá</th>
+                    <th>Số lượng</th>
+                    <th>Tổng</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    var hasDiscount = item.DiscountPercent > 0;
+                    var discountAmount = hasDiscount ? (item.Product.Price - item.DiscountedPrice) * item.Quantity : 0;
+
+                    <tr class="text-center align-middle" data-id="@item.Product.IdProduct">
+                        <!-- Checkbox -->
+                        <td>
+                            <input type="checkbox" class="selectItem" checked/>
+                        </td>
+
+                        <!-- Hình ảnh -->
+                        <td>
+                            <img src="@item.Product.Image" alt="@item.Product.Name" class="img-fluid rounded shadow-sm" />
+                        </td>
+
+                        <!-- Tên sản phẩm -->
+                        <td class="text-start">
+                            <strong>@item.Product.Name</strong>
+                            @if (hasDiscount)
+                            {
+                                <div class="text-success small mt-1">
+                                    🎁 Tiết kiệm <strong>@discountAmount.ToString("N0") ₫</strong> (-@item.DiscountPercent%)
+                                </div>
+                            }
+                        </td>
+
+                        <!-- Đơn giá -->
+                        <td>
+                            @if (hasDiscount)
+                            {
+                                <span class="text-muted text-decoration-line-through d-block small">
+                                    @item.Product.Price.ToString("N0") ₫
+                                </span>
+                                <span class="text-danger fw-bold">
+                                    @item.DiscountedPrice.ToString("N0") ₫
+                                </span>
+                            }
+                            else
+                            {
+                                <span>@item.Product.Price.ToString("N0") ₫</span>
+                            }
+                        </td>
+
+                        <!-- Số lượng -->
+                        <td>
+                            <div class="d-flex justify-content-center align-items-center">
+                                <button class="btn btn-outline-secondary btn-sm me-1 updateQty" data-action="decrease">-</button>
+                                <input type="number" class="form-control text-center qtyInput" value="@item.Quantity" min="1" style="width:60px">
+                                <button class="btn btn-outline-secondary btn-sm ms-1 updateQty" data-action="increase">+</button>
+                            </div>
+                        </td>
+
+                        <!-- Tổng cộng -->
+                        <td class="text-danger fw-bold subtotal" data-price="@item.DiscountedPrice">
+                            @((item.DiscountedPrice * item.Quantity).ToString("N0")) ₫
+                        </td>
+
+                        <!-- Nút xóa -->
+                        <td>
+                            <form asp-controller="Cart" asp-action="RemoveFromCart" method="post" class="d-inline removeForm">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="IdProduct" value="@item.Product.IdProduct" />
+                                <button type="submit" class="btn btn-outline-danger btn-sm">
+                                    <i class="bi bi-trash"></i> Xóa
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <!-- Tổng tiền -->
+        <div class="text-end mt-4">
+            <h5>
+                Tổng cộng:
+                <span id="totalAmount" class="text-danger fw-bold fs-5"></span>
+            </h5>
+
+            <a href="@Url.Action("Checkout", "Cart")" id="checkoutSelected" class="btn btn-primary mt-2" style="background: linear-gradient(90deg, #ffd76a, #ffb84d);">
+                <i class="bi bi-credit-card me-1 text-dark"></i> Thanh toán
+            </a>
+        </div>
+    }
+</div>
+</div>
+@section Scripts {
+<script>
+    function updateCartBadge(count) {
+        var badge = document.getElementById("cartCountBadge");
+        if (badge) badge.textContent = count;
+    }
+
+    $(".updateQty").click(function () {
+        var row = $(this).closest("tr");
+        var input = row.find(".qtyInput");
+        var currentQty = parseInt(input.val());
+        var action = $(this).data("action");
+
+        var newQty = action === "increase" ? currentQty + 1 : Math.max(1, currentQty - 1);
+        input.val(newQty);
+
+        // 🔹 Cập nhật subtotal của dòng dùng data-price
+        var price = parseFloat(row.find(".subtotal").data("price")); // giá đã giảm
+        var subtotal = price * newQty;
+        row.find(".subtotal").text(subtotal.toLocaleString() + " ₫");
+
+        // 🔹 Cập nhật tổng tiền theo checkbox
+        updateTotalSelected();
+    });
+
+    // Xóa sản phẩm
+    $(".removeForm").submit(function (e) {
+        e.preventDefault();
+        var form = $(this);
+        var row = form.closest("tr");
+
+        $.post(form.attr("action"), form.serialize(), function(data) {
+            row.remove();                     // remove dòng khỏi table
+            updateTotalSelected();            // update lại tổng tiền dựa trên checkbox còn lại
+            updateCartBadge(data.cartCount);  // cập nhật số lượng trên badge
+        }).fail(function() {
+            alert("❌ Xoá sản phẩm thất bại!");
+        });
+    });
+
+    $(document).ready(function(){
+        updateTotalSelected(); // true = tổng tất cả nếu chưa chọn
+    });
+
+    // Update tổng tiền dựa trên checkbox
+    function updateTotalSelected() {
+        var total = 0;
+        $("tr[data-id]").each(function() {
+            var row = $(this);
+            if(row.find(".selectItem").is(":checked")){
+                var price = parseFloat(row.find(".subtotal").data("price"));
+                var qty = parseInt(row.find(".qtyInput").val());
+                total += price * qty;
+            }
+        });
+        $("#totalAmount").text(total.toLocaleString() + " ₫");
+    }
+
+    // Chọn tất cả
+    $("#selectAll").change(function() {
+        $(".selectItem").prop("checked", $(this).prop("checked"));
+        updateTotalSelected();
+    });
+
+    // Chọn từng sản phẩm
+    $(".selectItem").change(function() {
+        updateTotalSelected();
+        var allChecked = $(".selectItem").length === $(".selectItem:checked").length;
+        $("#selectAll").prop("checked", allChecked);
+    });
+
+    // Nút Thanh toán → chuyển sang trang Checkout với các productId được chọn
+    $("#checkoutSelected").click(function(e){
+        e.preventDefault();
+
+        var selectedIds = [];
+        $("tr[data-id]").each(function(){
+            if($(this).find(".selectItem").is(":checked")){
+                selectedIds.push($(this).data("id"));
+            }
+        });
+
+        if(selectedIds.length === 0){
+            alert("❌ Vui lòng chọn ít nhất 1 sản phẩm để thanh toán!");
+            return;
+        }
+
+        // Chuyển sang trang Checkout + gửi danh sách productId qua query string hoặc session
+        var url = "@Url.Action("Checkout", "Cart")";
+        // Cách nhanh: gửi qua query string
+        window.location.href = url + "?productIds=" + selectedIds.join(",");
+    });
+</script>
+}

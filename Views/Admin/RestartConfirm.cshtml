@@ -1,0 +1,127 @@
+﻿@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Xác nhận khởi động lại hệ thống";
+}
+<style>
+    /* ===============================
+           DIRTYCOINS ADMIN THEME — SYSTEM PAGES
+           =============================== */
+
+    /* Table */
+    table.table {
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+        table.table th {
+            background: linear-gradient(135deg, #1c1c1c, #333);
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+    table.table-hover tbody tr:hover {
+        background-color: rgba(255, 240, 180, 0.3);
+        transition: 0.15s;
+    }
+
+    /* Filter form */
+    form.row.g-3.mb-3 input,
+    form.row.g-3.mb-3 button {
+        border-radius: 10px;
+    }
+
+    form.row.g-3.mb-3 button {
+        padding: 0.45rem 1rem;
+        font-weight: 500;
+    }
+
+    /* Card confirm */
+    .card {
+        border-radius: 16px;
+        border: none;
+        background: #fff;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        animation: fadeIn 0.3s ease;
+        margin: 80px auto 0px;
+        padding-bottom: 40px;
+    }
+
+        .card h3 {
+            font-weight: 700;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+        }
+
+    .btn {
+        border-radius: 10px !important;
+        font-weight: 500;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #c31432, #ff4b2b);
+        border: none;
+    }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+    .btn-outline-secondary:hover {
+        background: #eee;
+    }
+
+    .alert {
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, #fff6d3, #fff4b1);
+        border: 1px solid #ffe98b;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+</style>
+
+<div class="container mt-5 text-center">
+    <div class="card p-4 shadow-sm mx-auto" style="max-width: 500px;">
+        <h3 class="text-danger mb-3">⚠️ Xác nhận khởi động lại hệ thống</h3>
+        <p class="text-muted">
+            Hành động này sẽ đưa toàn bộ hệ thống trở lại trạng thái hoạt động bình thường.<br />
+            Vui lòng đăng nhập lại bằng tài khoản <strong>Admin</strong> để xác nhận.
+        </p>
+
+        <form asp-action="DoRestart" asp-controller="System" method="post" class="mt-4 text-start">
+            <div class="mb-3">
+                <label class="form-label fw-semibold">👤 Tên đăng nhập</label>
+                <input type="text" name="username" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label class="form-label fw-semibold">🔒 Mật khẩu</label>
+                <input type="password" name="password" class="form-control" required />
+            </div>
+            <button type="submit" class="btn btn-danger w-100 mt-3">♻️ Xác nhận khởi động lại</button>
+            <a href="/Admin/Dashboard" class="btn btn-outline-secondary w-100 mt-2">⬅ Quay lại</a>
+        </form>
+    </div>
+</div>

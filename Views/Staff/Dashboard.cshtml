@@ -1,0 +1,126 @@
+﻿@model DirtyCoins.Models.Employee
+@{
+    ViewData["Title"] = "Bảng điều khiển nhân viên";
+}
+
+<div class="container dirtycoins-body mt-5">
+    <div class="card border-0 shadow-sm p-4 hover-glow" style="border-radius:20px;">
+        <div class="row align-items-center mb-4">
+            <div class="col-md-8">
+                <h2 class="fw-bold" style="font-family:'Bebas Neue',sans-serif;color:var(--dc-green)">
+                    👋 Xin chào, <span class="text-dark">@Model.FullName!</span>
+                </h2>
+                <p><strong>Vị trí:</strong> @Model.Position</p>
+                <p><strong>Cửa hàng:</strong> @Model.Store?.StoreName</p>
+                <p><strong>Ngày nhận việc:</strong> @Model.HiredDate.ToString("dd/MM/yyyy")</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <img src="/media/community1.jpg" alt="Dashboard" class="img-fluid" style="max-height:120px;">
+            </div>
+        </div>
+
+        @Html.AntiForgeryToken()
+
+        <div class="row g-4">
+            <!-- CARD STATS -->
+            <div class="col-md-3">
+                <div class="card text-center border-0 shadow-sm hover-glow p-3 h-100 rounded-4">
+                    <h6 class="text-muted">Sản phẩm hiện có</h6>
+                    <h3 class="fw-bold text-dark">@ViewBag.TotalProducts</h3>
+                    <a href="@Url.Action("ManageProducts", "Staff")" class="btn bg-gold rounded-pill mt-2 fw-semibold">
+                        Quản lý sản phẩm
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center border-0 shadow-sm hover-glow p-3 h-100 rounded-4">
+                    <h6 class="text-muted">Đơn hàng đang xử lý</h6>
+                    <h3 class="fw-bold text-dark">@ViewBag.TotalOrders</h3>
+                    <a href="@Url.Action("ManageOrders", "Staff")" class="btn bg-green text-white rounded-pill mt-2 fw-semibold">
+                        Quản lý đơn hàng
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center border-0 shadow-sm hover-glow p-3 h-100 rounded-4">
+                    <h6 class="text-muted">Khách hàng</h6>
+                    <h3 class="fw-bold text-dark">@ViewBag.TotalCustomers</h3>
+                    <a href="@Url.Action("ManageCustomers", "Staff")" class="btn btn-outline-dark rounded-pill mt-2 fw-semibold">
+                        Xếp hạng thành viên
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-md-3">
+                <div class="card text-center border-0 shadow-sm hover-glow p-3 h-100 rounded-4">
+                    <h6 class="text-muted">Liên hệ chưa xử lý</h6>
+                    <h3 id="pendingCount" class="fw-bold text-dark">@ViewBag.PendingFeedbacks</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- LIÊN HỆ MỚI -->
+        <div class="card mt-5 border-0 shadow-sm hover-glow rounded-4">
+            <div class="card-header bg-dark text-light fw-semibold">
+                <i class="bi bi-envelope-paper me-2 text-gold"></i> Liên hệ mới nhất
+            </div>
+            <ul class="list-group list-group-flush" id="contactList">
+                @if (ViewBag.Contacts != null && ((List<DirtyCoins.Models.Contact>)ViewBag.Contacts).Any())
+                {
+                    foreach (var c in (List<DirtyCoins.Models.Contact>)ViewBag.Contacts)
+                    {
+                        <li class="list-group-item d-flex justify-content-between align-items-start">
+                            <div>
+                                <strong>@c.Name</strong> – <span class="text-muted">@c.Email</span><br />
+                                <small class="text-secondary">@c.Message?.Substring(0, Math.Min(c.Message.Length, 50))...</small>
+                            </div>
+                            <div>
+                                <input type="checkbox" class="form-check-input handleContactCheckbox" data-id="@c.IdContact"
+                                       @(c.IsHandled ? "checked disabled" : "") />
+                            </div>
+                        </li>
+                    }
+                }
+                else
+                {
+                    <li class="list-group-item text-center text-muted py-3">
+                        <i class="bi bi-inbox me-2"></i> Chưa có liên hệ mới
+                    </li>
+                }
+            </ul>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelectorAll(".handleContactCheckbox").forEach(cb => {
+                cb.addEventListener("change", function() {
+                    if (!this.checked) return;
+                    const id = this.dataset.id;
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+                    fetch("/Staff/HandleContact", {
+                        method: "POST",
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: `__RequestVerificationToken=${token}&idContact=${id}`
+                    })
+                    .then(r => r.json())
+                    .then(d => {
+                        if (d.success) {
+                            this.disabled = true;
+                            const counter = document.getElementById("pendingCount");
+                            if (counter) counter.textContent = Math.max(0, parseInt(counter.textContent) - 1);
+                        } else {
+                            alert(d.message || "Có lỗi xảy ra.");
+                            this.checked = false;
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+}

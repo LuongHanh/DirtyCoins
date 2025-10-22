@@ -1,0 +1,50 @@
+﻿# =============================
+# Build folders
+# =============================
+bin/
+obj/
+publish/
+
+# =============================
+# User-specific files
+# =============================
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# =============================
+# Logs
+# =============================
+wwwroot/logs/
+*.log
+
+# =============================
+# Environment & Secrets
+# =============================
+.env
+client_secret_*
+appsettings.*.json
+appsettings.json
+
+# =============================
+# Visual Studio / JetBrains
+# =============================
+.vscode/
+.idea/
+.vs/
+
+# =============================
+# OS generated files
+# =============================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =============================
+# Temporary files
+# =============================
+*.tmp
+*.bak
+*.swp
+*.lock

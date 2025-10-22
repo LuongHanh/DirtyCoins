@@ -1,0 +1,116 @@
+﻿@{
+    ViewData["Title"] = "Chế độ bảo trì (Admin)";
+}
+<style>
+    /* ===============================
+           DIRTYCOINS ADMIN THEME — SYSTEM PAGES
+           =============================== */
+
+    /* Table */
+    table.table {
+        border-radius: 12px;
+        overflow: hidden;
+        background: #fff;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+    }
+
+        table.table th {
+            background: linear-gradient(135deg, #1c1c1c, #333);
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 2;
+        }
+
+    table.table-hover tbody tr:hover {
+        background-color: rgba(255, 240, 180, 0.3);
+        transition: 0.15s;
+    }
+
+    /* Filter form */
+    form.row.g-3.mb-3 input,
+    form.row.g-3.mb-3 button {
+        border-radius: 10px;
+    }
+
+    form.row.g-3.mb-3 button {
+        padding: 0.45rem 1rem;
+        font-weight: 500;
+    }
+
+    /* Card confirm */
+    .card {
+        border-radius: 16px;
+        border: none;
+        background: #fff;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        animation: fadeIn 0.3s ease;
+    }
+
+        .card h3 {
+            font-weight: 700;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+        }
+
+    .btn {
+        border-radius: 10px !important;
+        font-weight: 500;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #c31432, #ff4b2b);
+        border: none;
+    }
+
+        .btn-danger:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+    .btn-outline-secondary:hover {
+        background: #eee;
+    }
+
+    .alert {
+        border-radius: 16px;
+        box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, #fff6d3, #fff4b1);
+        border: 1px solid #ffe98b;
+    }
+
+    @@keyframes fadeIn {
+        from
+
+    {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    }
+</style>
+
+<div class="container text-center mt-5">
+    <div class="alert alert-warning p-4 shadow-sm">
+        <h3 class="fw-bold text-dark mb-2">🛠️ Hệ thống đang trong chế độ bảo trì</h3>
+        <p class="mt-3 text-muted">
+            Tuy nhiên bạn đang đăng nhập với quyền <b>Admin</b> nên vẫn có thể truy cập và kiểm tra hệ thống.
+        </p>
+        <hr />
+        <div class="d-flex justify-content-center gap-3">
+            <a href="/Admin/Dashboard" class="btn btn-primary px-4">🔧 Vào bảng điều khiển</a>
+            <a href="/" class="btn btn-outline-secondary px-4">🏠 Về trang chủ</a>
+        </div>
+    </div>
+</div>
+

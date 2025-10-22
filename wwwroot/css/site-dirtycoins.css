@@ -1,0 +1,344 @@
+﻿/* ============================================================
+   DIRTYCOINS THEME - Premium Edgy x Playful Youth
+   ============================================================ */
+
+/* ---------- Root Variables ---------- */
+:root {
+    --dc-yellow: #FFD700;
+    --dc-green: #006400;
+    --dc-dark: #0D0D0D;
+    --dc-darker: #1A1A1A;
+    --dc-light: #FFFFFF;
+    --dc-bg-soft: #FBFBFB;
+    --dc-text-dark: #111111;
+    --dc-text-light: #FFFFFF;
+    --transition: all 0.25s ease;
+}
+
+/* ---------- Global Style ---------- */
+html, body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', 'Poppins', sans-serif;
+    background: var(--dc-light);
+    color: var(--dc-text-dark);
+    overflow-x: hidden;
+}
+
+a {
+    text-decoration: none;
+    transition: var(--transition);
+}
+
+    a:hover {
+        color: var(--dc-yellow);
+    }
+
+.container-fluid {
+    padding: 0;
+}
+
+/* ---------- Scrollbar ---------- */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--dc-yellow), var(--dc-green));
+    border-radius: 10px;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+header {
+    position: sticky;
+    top: 0;
+    width: 100%;
+    z-index: 3000;
+    transition: all 0.4s ease;
+}
+
+.navbar-dc {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+    background: linear-gradient(90deg, var(--dc-dark), var(--dc-darker));
+    padding: 0.8rem 1.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    transition: var(--transition);
+}
+
+.text-truncate-branch {
+    display: inline-block;
+    max-width: 100px; /* hoặc bao nhiêu tùy ý */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: middle;
+}
+
+#mainHeader.scrolled .navbar-dc {
+    padding: 0.5rem 1rem;
+    background: rgba(13,13,13,0.95);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 4px 25px rgba(0,0,0,0.6);
+}
+
+/* LOGO */
+.navbar-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    color: var(--dc-yellow) !important;
+    font-size: 1.8rem;
+    letter-spacing: 1px;
+    transition: var(--transition);
+}
+
+    .navbar-brand:hover {
+        text-shadow: 0 0 15px rgba(255,215,0,0.8);
+        transform: scale(1.05);
+    }
+
+/* NAV LINKS */
+.navbar-nav .nav-link {
+    color: var(--dc-text-light) !important;
+    font-weight: 500;
+    margin: 0 0.6rem;
+    transition: var(--transition);
+}
+
+    .navbar-nav .nav-link:hover {
+        color: var(--dc-yellow) !important;
+        transform: translateY(-1px);
+    }
+
+/* DROPDOWN */
+.dropdown-menu {
+    border-radius: 12px;
+    border: none;
+    background-color: #181818;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.2s ease;
+}
+
+.dropdown-item {
+    color: #ddd;
+    font-weight: 500;
+    transition: var(--transition);
+}
+
+    .dropdown-item:hover {
+        background-color: var(--dc-yellow);
+        color: #111;
+        font-weight: 600;
+    }
+
+/* CART BADGE */
+#cartCountBadge {
+    background: crimson;
+    font-size: 0.7rem;
+    padding: 2px 5px;
+    border-radius: 10px;
+}
+
+/* LOGIN BUTTON */
+.btn-login {
+    background: var(--dc-yellow);
+    border: none;
+    color: #111;
+    font-weight: 600;
+    border-radius: 20px;
+    padding: 6px 16px;
+    transition: var(--transition);
+}
+
+    .btn-login:hover {
+        background-color: #fff;
+        transform: translateY(-2px);
+    }
+
+/* AVATAR BORDER */
+.nav-link.dropdown-toggle img {
+    border: 2px solid var(--dc-yellow);
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+/* MOBILE MENU */
+@media (max-width: 992px) {
+    .navbar-collapse {
+        background-color: #111;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 10px;
+    }
+}
+
+/* ============================================================
+   MAIN BODY
+   ============================================================ */
+.dirtycoins-body {
+    background: radial-gradient(circle at 20% 10%, #fffefb 0%, #fff9ec 30%, #fff4d9 70%, #f3efe7 100%);
+    animation: fadeInUp 0.4s ease;
+    min-height: 70vh;
+    padding: 1.5rem 0px;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+.dc-footer {
+    background: linear-gradient(180deg, var(--dc-dark) 0%, var(--dc-darker) 100%);
+    color: #bbb;
+    position: relative;
+    overflow: hidden;
+}
+
+    .dc-footer::before {
+        content: "";
+        position: absolute;
+        top: -120px;
+        left: -100px;
+        width: 320px;
+        height: 320px;
+        background: radial-gradient(circle, rgba(255,215,0,0.08) 0%, transparent 70%);
+        transform: rotate(45deg);
+    }
+
+    .dc-footer h5 {
+        color: var(--dc-yellow);
+        font-weight: 700;
+        margin-bottom: 15px;
+        font-size: 1.1rem;
+    }
+
+    .dc-footer a {
+        color: #aaa;
+        text-decoration: none;
+        display: block;
+        margin-bottom: 8px;
+        transition: var(--transition);
+    }
+
+        .dc-footer a:hover {
+            color: var(--dc-yellow);
+        }
+
+.footer-bottom {
+    border-top: 1px solid #222;
+    font-size: 0.9rem;
+    color: #888;
+}
+
+/* ============================================================
+   TOAST / ALERTS
+   ============================================================ */
+.maintenance-toast {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: rgba(20, 20, 20, 0.95);
+    color: #fff;
+    padding: 15px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(247, 201, 72, 0.3);
+    box-shadow: 0 4px 25px rgba(0, 0, 0, 0.4);
+    animation: slideUp 0.4s ease;
+    z-index: 9999;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(40px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* ============================================================
+   HOVER GLOW / MISC EFFECTS
+   ============================================================ */
+.hover-glow:hover {
+    box-shadow: 0 0 10px rgba(255,215,0,0.5);
+}
+
+.text-gold {
+    color: var(--dc-yellow) !important;
+}
+
+.text-green {
+    color: var(--dc-green) !important;
+}
+
+.bg-gold {
+    background: var(--dc-yellow) !important;
+    color: #111 !important;
+}
+
+.bg-green {
+    background: var(--dc-green) !important;
+    color: #fff !important;
+}
+/* ---------- Dashboard Director ---------- */
+.card {
+    border: 1px solid rgba(0,0,0,0.05);
+    transition: all 0.3s ease;
+}
+
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+
+.card-header {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.bg-gold-gradient {
+    background: linear-gradient(90deg, #FFD700, #FFF2B2);
+    color: #111;
+}
+
+.bg-green-gradient {
+    background: linear-gradient(90deg, #006400, #00A86B);
+    color: #fff;
+}
+
+.bg-dark-gradient {
+    background: linear-gradient(90deg, #0D0D0D, #1A1A1A);
+    color: #FFD700;
+}
+
+.btn-outline-gold {
+    border: 2px solid var(--dc-yellow);
+    color: var(--dc-dark);
+    font-weight: 600;
+    transition: var(--transition);
+    margin-top: 80px;
+}
+
+    .btn-outline-gold:hover {
+        background: var(--dc-yellow);
+        color: #111;
+    }

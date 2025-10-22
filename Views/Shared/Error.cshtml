@@ -1,0 +1,131 @@
+﻿@{
+    Layout = null;
+    ViewData["Title"] = "Lỗi hệ thống";
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewData["Title"]</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
+
+    <style>
+        :root {
+            --dc-yellow: #FFD700;
+            --dc-dark: #111;
+            --dc-bg: #FBFBFB;
+        }
+
+        body {
+            background: var(--dc-bg);
+            font-family: 'Inter', 'Poppins', sans-serif;
+            color: var(--dc-dark);
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .error-card {
+            background: #fff;
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 90%;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .error-icon {
+            font-size: 3.5rem;
+            color: var(--dc-yellow);
+            text-shadow: 0 0 12px rgba(255,215,0,0.4);
+        }
+
+        .btn-dc {
+            border-radius: 25px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-dc-primary {
+            background-color: var(--dc-yellow);
+            border: none;
+            color: #111;
+        }
+
+            .btn-dc-primary:hover {
+                background-color: #fff;
+                box-shadow: 0 0 10px rgba(255,215,0,0.6);
+            }
+
+        .btn-dc-outline {
+            border: 1px solid #ccc;
+            color: #555;
+        }
+
+            .btn-dc-outline:hover {
+                background-color: var(--dc-yellow);
+                color: #000;
+                border-color: var(--dc-yellow);
+            }
+
+        @@keyframes fadeIn {
+            from
+
+        {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="error-card text-center p-5">
+        <div class="error-icon mb-3">
+            @if (ViewBag.StatusCode == 404)
+            {
+                <i class="bi bi-exclamation-triangle-fill"></i>
+            }
+            else if (ViewBag.StatusCode == 403)
+            {
+                <i class="bi bi-shield-exclamation"></i>
+            }
+            else
+            {
+                <i class="bi bi-bug-fill"></i>
+            }
+        </div>
+
+        <h2 class="fw-bold mb-2">Lỗi @ViewBag.StatusCode</h2>
+        <p class="text-muted mb-4">@ViewBag.Message</p>
+
+        <div class="d-flex justify-content-center gap-2">
+            <a href="@Url.Action("Index", "Home")" class="btn btn-dc btn-dc-primary">
+                ← Quay lại trang chủ
+            </a>
+            <button class="btn btn-dc btn-dc-outline" onclick="location.reload()">Thử lại</button>
+        </div>
+
+        @if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "Development")
+        {
+            <div class="text-start mt-4">
+                <p class="fw-semibold text-secondary small mb-1">Chi tiết lỗi (Dev Only):</p>
+                <pre class="bg-light rounded p-3 small">@ViewBag.Message</pre>
+            </div>
+        }
+    </div>
+</body>
+</html>
