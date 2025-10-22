@@ -1,4 +1,9 @@
 ﻿<<<<<<<<<<<<<<<<<<<<<<<WELL DONE>>>>>>>>>>>>>>>>>>>>>>>>
+### LỖI PHÁT TRINH KHI DEPLOY:
+- Các popup, đang bị thấp hơn footer, nên bị che mất thông tin
+
+
+
 
 BUILD:
 -KẾT NỐI DB THÀNH CÔNG
@@ -52,8 +57,7 @@ Các chức năng chính
 •	Quản lý hệ thống: OK
 
 ----------------
-DEPLOY: CHƯA CÓ GÌ
-
+DEPLOY: RENDER VỚI CẤU HÌNH MÔI TRƯỜNG VÀ CHẠY BẰNG DOCKER
 
 +++++++++THƯ MỤC wwwroot/logs/... lưu log của run 5 procedure+++++++++++++++++
 TRONG DB: Bảng Orders, trường IdEmployee không được liên kết FK với bảng Employee
