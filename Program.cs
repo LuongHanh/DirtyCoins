@@ -85,7 +85,7 @@ builder.Services.AddAuthentication(options =>
                        ?? Environment.GetEnvironmentVariable("GOOGLE_CLIENT_ID") ?? "";
     options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]
                            ?? Environment.GetEnvironmentVariable("GOOGLE_CLIENT_SECRET") ?? "";
-
+    options.CallbackPath = "/signin-google";
     if (string.IsNullOrWhiteSpace(options.ClientId) || string.IsNullOrWhiteSpace(options.ClientSecret))
         Console.WriteLine("⚠️ Google Auth chưa cấu hình!");
 
