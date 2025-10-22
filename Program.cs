@@ -22,11 +22,6 @@ builder.Configuration
 Env.Load();
 
 // ================================
-// 2️⃣ Thiết lập EPPlus license
-// ================================
-ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
-
-// ================================
 // 3️⃣ Kết nối CSDL
 // ================================
 var connectionString =
