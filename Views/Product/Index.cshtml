@@ -397,6 +397,74 @@
             box-shadow: 0 10px 30px rgba(255,200,50,0.08);
             cursor: pointer;
         }
+    @@media (max-width: 768px) {
+        /* Filter rail chuyển sang top, không fixed */
+        .filter-rail
+
+    {
+        position: static;
+        width: 100%;
+        margin: 0 10px 20px;
+        padding: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: none;
+        border: none;
+        backdrop-filter: none;
+    }
+
+    .filter-rail h4 {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 8px;
+    }
+
+    /* Deck stage margin-left remove */
+    .deck-stage {
+        margin-left: 0;
+        padding: 12px 16px 36px;
+    }
+
+    /* Grid posters nhỏ hơn, gap giảm */
+    .deck {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 16px;
+    }
+
+    /* Poster media height responsive */
+    .poster .media img {
+        height: 150px;
+    }
+
+    /* Hero text scale */
+    .chaos-hero h1 {
+        font-size: 28px;
+        padding: 12px 24px;
+    }
+
+    /* Deck controls nhỏ và top-right không che poster */
+    .deck-controls {
+        top: auto;
+        bottom: 20px;
+        right: 10px;
+        flex-direction: row;
+        gap: 6px;
+    }
+
+    /* Ribbon và badges scale */
+    .ribbon {
+        font-size: 0.7rem;
+        padding: 4px 10px;
+    }
+
+    .badge-top {
+        font-size: 0.7rem;
+        padding: 4px 8px;
+    }
+
+    }
 </style>
 
 <div class="product-chaos-wrap">

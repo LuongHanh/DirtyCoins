@@ -177,6 +177,78 @@ hr.my-5 {
     border-color: #ffbb33;
     transition: all 0.25s;
 }
+    /* ================== RESPONSIVE MOBILE ================== */
+    @@media (max-width: 991.98px) {
+        .des-and-feed
+
+    {
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .product-description,
+    .des-and-feed section {
+        width: 100% !important;
+    }
+
+    }
+
+    @@media (max-width: 576px) {
+        .product-detail-page .btn
+
+    {
+        font-size: 0.9rem;
+        padding: 0.4rem 0.8rem;
+    }
+
+    .product-detail-page input[type=number] {
+        width: 100%;
+        margin-top: 0.5rem;
+    }
+
+    .d-flex.align-items-center.flex-wrap.gap-3.mb-3 {
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .thumbnail-row img.thumb {
+        width: 50px;
+        height: 50px;
+    }
+
+    #starRating {
+        justify-content: center;
+    }
+
+    .feedback-pagination {
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    }
+
+    /* Responsive table & gallery */
+    .table-responsive {
+        overflow-x: auto;
+    }
+
+    .product-gallery .main-image img {
+        max-width: 100%;
+        height: auto;
+    }
+
+    .thumbnail-row {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .image-popup img {
+        max-width: 90%;
+        max-height: 90%;
+    }
 </style>
 
 <!-- ================= PRODUCT DETAILS PAGE ================= -->

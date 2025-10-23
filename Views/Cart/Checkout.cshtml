@@ -146,7 +146,121 @@
             transform: scale(1.05);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
         }
+    /* ================= CHECKOUT PAGE RESPONSIVE ================= */
+    @@media (max-width: 991.98px) {
+        .checkout-form, .order-summary
 
+    {
+        padding: 1.5rem;
+    }
+
+    .checkout-page h2 {
+        font-size: 1.6rem;
+    }
+
+    .order-summary h5 {
+        font-size: 1.1rem;
+    }
+
+    .btn-success, .btn-gold {
+        padding: 0.5rem 1.2rem;
+        font-size: 0.9rem;
+    }
+
+    .qr-container .img-qr {
+        width: 280px;
+    }
+
+        .text-end{
+            display: flex;
+        }
+
+    }
+
+    @@media (max-width: 768px) {
+        .checkout-page .row
+
+    {
+        flex-direction: column-reverse;
+    }
+
+    .checkout-form, .order-summary {
+        width: 100%;
+        margin-bottom: 1.5rem;
+    }
+
+        .checkout-form input,
+        .checkout-form textarea,
+        .checkout-form select {
+            font-size: 0.9rem;
+        }
+
+    .qr-container .img-qr {
+        width: 240px;
+    }
+
+    .popup-content h5 {
+        font-size: 1rem;
+    }
+
+    .popup-content .popup-icon {
+        font-size: 2.2rem;
+    }
+
+    }
+
+    .text-end {
+        display: flex;
+    }
+
+    @@media (max-width: 576px) {
+        .checkout-page h2
+
+    {
+        font-size: 1.4rem;
+    }
+
+    .checkout-form label {
+        font-size: 0.9rem;
+    }
+
+    .checkout-form input,
+    .checkout-form textarea,
+    .checkout-form select {
+        font-size: 0.85rem;
+    }
+
+    .btn-success, .btn-gold {
+        width: 100%;
+        padding: 0.5rem 0;
+        font-size: 0.85rem;
+    }
+
+    .order-summary {
+        padding: 1rem;
+    }
+
+        .order-summary h5 {
+            font-size: 1rem;
+        }
+
+    .qr-container .img-qr {
+        width: 200px;
+    }
+
+    .popup-content h5 {
+        font-size: 0.95rem;
+    }
+
+    .popup-content .popup-icon {
+        font-size: 2rem;
+    }
+
+        .text-end {
+            display: flex;
+        }
+
+    }
 </style>
 
 <div class="checkout-page">

@@ -290,6 +290,51 @@
         .modal-body::-webkit-scrollbar-thumb:hover {
             background-color: #999;
         }
+    /* --------- TABLE RESPONSIVE --------- */
+    .table-responsive {
+        overflow-x: auto; /* scroll ngang nếu bảng quá rộng */
+        -webkit-overflow-scrolling: touch; /* mượt trên mobile */
+    }
+
+    /* Ẩn cột trên màn hình nhỏ */
+    @@media (max-width: 768px) {
+        /* Ẩn cột Email (cột 3) */
+        #customerTable th:nth-child(3), #customerTable td:nth-child(3), #staffTable th:nth-child(3), #staffTable td:nth-child(3)
+
+    {
+        display: none;
+    }
+
+    /* Ẩn cột vai trò (cột 4) cho mobile */
+    #staffTable th:nth-child(4),
+    #staffTable td:nth-child(4) {
+        display: none;
+    }
+
+    /* Chỉnh td trancate cho nhỏ hơn */
+    td.truncate {
+        max-width: 120px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    }
+
+    /* Scrollbar tinh tế */
+    .table-responsive::-webkit-scrollbar {
+        height: 6px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 3px;
+    }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background-color: #aaa;
+        }
+
 </style>
 
 <div class="container-fluid mt-4 admin-users">

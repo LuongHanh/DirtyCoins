@@ -10,6 +10,12 @@
         margin: 80px auto 0px;
         padding-bottom: 40px;
     }
+
+    @@media (max-width: 768px) {
+        .res-mb{
+            display:flex;
+        }
+    }
 </style>
 
 <div class="container py-4 fade-in db-dir">
@@ -46,7 +52,7 @@
     </div>
 
     <!-- Navigation -->
-    <div class="text-center mt-3 mb-5">
+    <div class="text-center mt-3 mb-5 res-mb">
         <a href="@Url.Action("StoresReport", "Director")" class="btn border-2 border-warning mx-2 px-4 py-2 rounded-pill">
             <i class="bi bi-shop me-1"></i> Xem chi tiết chi nhánh
         </a>
