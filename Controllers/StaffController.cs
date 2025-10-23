@@ -95,14 +95,35 @@ namespace DirtyCoins.Controllers
         [HttpGet]
         public IActionResult ManageProducts()
         {
+            // 🔹 Lấy IdUser hiện tại
+            var idUser = GetCurrentUserId();
+            if (!idUser.HasValue)
+                return RedirectToAction("Login", "Account");
+
+            // 🔹 Lấy nhân viên tương ứng (đang đăng nhập)
+            var employee = _context.Employee
+                .Include(e => e.Store)
+                .FirstOrDefault(e => e.IdUser == idUser.Value);
+
+            if (employee == null)
+                return RedirectToAction("Dashboard", "Store"); // hoặc báo lỗi phù hợp
+
+            var idStore = employee.IdStore;
+
+            // 🔹 Lấy danh sách sản phẩm thuộc cửa hàng nhân viên
             var products = _context.Products
                 .Include(p => p.Category)
+                .Where(p => p.IdStore == idStore) // 👈 chỉ lấy sản phẩm của store đó
                 .OrderByDescending(p => p.IdProduct)
                 .ToList();
+
+            // 🔹 Các dữ liệu phụ trợ
             var promotions = _context.Promotions.ToList();
             var categories = _context.Categories.ToList();
+
             ViewBag.Categories = categories;
             ViewBag.Promotions = promotions;
+
             return View(products);
         }
 
@@ -690,14 +711,32 @@ namespace DirtyCoins.Controllers
         // -------------------------------
         public IActionResult ManageCustomers()
         {
+            // 🔹 Lấy IdUser hiện tại
+            var idUser = GetCurrentUserId();
+            if (!idUser.HasValue)
+                return RedirectToAction("Login", "Account");
+
+            // 🔹 Lấy nhân viên hiện tại
+            var employee = _context.Employee
+                .Include(e => e.Store)
+                .FirstOrDefault(e => e.IdUser == idUser.Value);
+
+            if (employee == null)
+                return RedirectToAction("Dashboard", "Store");
+
+            int idStore = employee.IdStore;
+
+            // 🔹 Lấy khách hàng chỉ thuộc cửa hàng đó
             var stats = _context.CustomerRankStats
                 .Include(c => c.Customer)
+                .Where(c => c.Customer.Orders.Any(o => o.IdStore == idStore)) // 👈 lọc theo store
                 .OrderByDescending(c => c.TotalSpent)
                 .ToList();
 
             return View(stats);
         }
-        public IActionResult ExportCustomersToExcel()
+
+        public IActionResult ExportCustomersToExcel() // Đang xuất toàn bộ chuỗi
         {
             var stats = _context.CustomerRankStats
                 .Include(c => c.Customer)

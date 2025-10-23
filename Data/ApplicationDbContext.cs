@@ -140,6 +140,11 @@ namespace DirtyCoins.Data
                 .WithMany()
                 .HasForeignKey(pp => pp.IdProduct)
                 .OnDelete(DeleteBehavior.Cascade);
+            modelBuilder.Entity<Product>()
+                .HasOne(p => p.Store)
+                .WithMany(s => s.Products)
+                .HasForeignKey(p => p.IdStore)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

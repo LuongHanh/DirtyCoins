@@ -15,11 +15,12 @@ namespace DirtyCoins.Models
         public string StoreOwner { get; set; }
         [ForeignKey("User")]
         public int IdUser { get; set; }
-        public User? User { get; set; }  // ✅
+        public User User { get; set; }  
 
         public ICollection<Employee> Employees { get; set; }
         public ICollection<Inventory> Inventories { get; set; }
         public ICollection<Report> Reports { get; set; }
         public ICollection<MonthlyInventory> MonthlyInventories { get; set; }
+        public ICollection<Product> Products { get; set; } = new List<Product>();
     }
 }

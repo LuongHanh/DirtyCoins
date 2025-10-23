@@ -29,7 +29,7 @@ namespace DirtyCoins.Models
         public string Phone { get; set; }
 
         [MaxLength(13)]
-        public string OrderCode { get; set; }
+        public string? OrderCode { get; set; }
         public ICollection<OrderDetail> OrderDetails { get; set; }
     }
 }
