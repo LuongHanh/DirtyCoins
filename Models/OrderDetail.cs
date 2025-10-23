@@ -9,6 +9,7 @@ namespace DirtyCoins.Models
         [ForeignKey("Order")]
         public int IdOrder { get; set; }
         public Order Order { get; set; }
+
         [ForeignKey("Product")]
         public int IdProduct { get; set; }
         public Product Product { get; set; }

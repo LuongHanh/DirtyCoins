@@ -1,4 +1,5 @@
 ﻿// Models/Product.cs
+using DocumentFormat.OpenXml.Wordprocessing;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace DirtyCoins.Models
@@ -14,7 +15,10 @@ namespace DirtyCoins.Models
         public decimal Price { get; set; }
         public int Quantity { get; set; } // global stock (optional)
         public string Image { get; set; }
-        public int IdStore { get; set; }
+
+        [ForeignKey("Store")]
+        public int? IdStore { get; set; }
+        public Store? Store { get; set; }
         public string Intro { get; set; }
 
         public ICollection<OrderDetail> OrderDetails { get; set; }
