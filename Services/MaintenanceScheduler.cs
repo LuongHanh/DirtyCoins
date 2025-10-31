@@ -31,18 +31,7 @@ namespace DirtyCoins.Services
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            _logger.LogInformation("🕓 MaintenanceScheduler đang khởi động...");
-
-            try
-            {
-                // Đợi 5 giây để đảm bảo DB và SignalR sẵn sàng (rất quan trọng khi chạy Render/Azure)
-                await Task.Delay(TimeSpan.FromSeconds(5), stoppingToken);
-            }
-            catch (TaskCanceledException)
-            {
-                _logger.LogWarning("⚠️ MaintenanceScheduler bị hủy khi khởi động (delay startup).");
-                return; // kết thúc nhẹ nhàng, không crash host
-            }
+            _logger.LogInformation("🕓 MaintenanceScheduler đang chạy...");
 
             while (!stoppingToken.IsCancellationRequested)
             {
@@ -73,6 +62,7 @@ namespace DirtyCoins.Services
                         });
                         await File.WriteAllTextAsync(_filePath, json, stoppingToken);
 
+                        // 🔔 Gửi thông báo realtime đến toàn bộ client
                         await _hubContext.Clients.All.SendAsync("MaintenanceAlert", new
                         {
                             pending.IsImportant,
@@ -81,43 +71,24 @@ namespace DirtyCoins.Services
                             pending.Reason
                         });
 
+                        // Nếu là bảo trì quan trọng → cho client biết sắp chặn
                         if (pending.IsImportant)
                         {
                             await _hubContext.Clients.All.SendAsync("ForceMaintenance", new
                             {
                                 Message = "🚨 Hệ thống sẽ tạm dừng trong giây lát để bảo trì quan trọng.",
-                                RedirectAfter = 5
+                                RedirectAfter = 5 // giây
                             });
                         }
                     }
                 }
-                catch (TaskCanceledException)
-                {
-                    _logger.LogWarning("MaintenanceScheduler bị hủy do app dừng (TaskCanceledException).");
-                    break;
-                }
-                catch (OperationCanceledException)
-                {
-                    _logger.LogWarning("MaintenanceScheduler bị hủy do token (OperationCanceledException).");
-                    break;
-                }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "❌ Lỗi MaintenanceScheduler: {Message}", ex.Message);
+                    _logger.LogError($"❌ Lỗi MaintenanceScheduler: {ex.Message}");
                 }
 
-                try
-                {
-                    await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
-                }
-                catch (TaskCanceledException)
-                {
-                    _logger.LogWarning("⏹ MaintenanceScheduler bị hủy khi chờ (delay loop).");
-                    break;
-                }
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
             }
-
-            _logger.LogInformation("🧹 MaintenanceScheduler đã dừng.");
         }
     }
 }
