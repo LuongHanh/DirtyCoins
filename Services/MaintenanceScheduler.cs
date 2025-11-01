@@ -86,8 +86,8 @@ namespace DirtyCoins.Services
                 {
                     _logger.LogError($"❌ Lỗi MaintenanceScheduler: {ex.Message}");
                 }
-
-                //await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
+                //Nếu chạy local thì comment dòng này để test nhanh hơn
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
             }
         }
     }
